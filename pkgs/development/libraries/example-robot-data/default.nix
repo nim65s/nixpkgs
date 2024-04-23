@@ -1,9 +1,10 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, pythonSupport ? false
-, python3Packages
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pythonSupport ? false,
+  python3Packages,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -20,13 +21,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   strictDeps = true;
 
-  nativeBuildInputs = [
-    cmake
-  ];
+  nativeBuildInputs = [ cmake ];
 
-  propagatedBuildInputs = lib.optionals pythonSupport [
-    python3Packages.pinocchio
-  ];
+  propagatedBuildInputs = lib.optionals pythonSupport [ python3Packages.pinocchio ];
 
   cmakeFlags = [ (lib.cmakeBool "BUILD_PYTHON_INTERFACE" pythonSupport) ];
 
@@ -35,15 +32,16 @@ stdenv.mkDerivation (finalAttrs: {
   # either in install prefix or in the sources
   # where it can find the meshes for unit tests
   preCheck = "ln -s source ../../${finalAttrs.pname}";
-  pythonImportsCheck = [
-    "example_robot_data"
-  ];
+  pythonImportsCheck = [ "example_robot_data" ];
 
   meta = with lib; {
     description = "Set of robot URDFs for benchmarking and developed examples.";
     homepage = "https://github.com/Gepetto/example-robot-data";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ nim65s wegank ];
+    maintainers = with maintainers; [
+      nim65s
+      wegank
+    ];
     platforms = platforms.unix;
   };
 })
