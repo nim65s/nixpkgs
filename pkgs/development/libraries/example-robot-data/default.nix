@@ -24,13 +24,11 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
   ];
 
-  buildInputs = lib.optionals pythonSupport [
+  propagatedBuildInputs = lib.optionals pythonSupport [
     python3Packages.pinocchio
   ];
 
-  cmakeFlags = lib.optionals (!pythonSupport) [
-    "-DBUILD_PYTHON_INTERFACE=OFF"
-  ];
+  cmakeFlags = [ (lib.cmakeBool "BUILD_PYTHON_INTERFACE" pythonSupport) ];
 
   doCheck = true;
   # The package expect to find an `example-robot-data/robots` folder somewhere
