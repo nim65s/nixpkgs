@@ -10,18 +10,18 @@
 , qhull
 , pythonSupport ? false
 , python3Packages
+, jrl-cmakemodules
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "hpp-fcl";
-  version = "2.4.4";
+  version = "3.0.0-pre";
 
   src = fetchFromGitHub {
     owner = "humanoid-path-planner";
-    repo = finalAttrs.pname;
-    rev = "v${finalAttrs.version}";
-    fetchSubmodules = true;
-    hash = "sha256-BwS9RSirdlD6Cqwp7KD59dkh2WsJVwdlH9LzM2AFjI4=";
+    repo = "hpp-fcl";
+    rev = "4674799ce2f7dd8406f9e25f125a79c0e165bf1e";
+    hash = "sha256-tQcMOfU9lk+tWTQwVscZG5uCCNAjH5aw6pGS34vXRx4=";
   };
 
   strictDeps = true;
@@ -33,6 +33,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   propagatedBuildInputs = [
     assimp
+    jrl-cmakemodules
     qhull
     octomap
   ] ++ lib.optionals (!pythonSupport) [
@@ -46,8 +47,7 @@ stdenv.mkDerivation (finalAttrs: {
   cmakeFlags = [
     "-DHPP_FCL_HAS_QHULL=ON"
     "-DINSTALL_DOCUMENTATION=ON"
-  ] ++ lib.optionals (!pythonSupport) [
-    "-DBUILD_PYTHON_INTERFACE=OFF"
+    (lib.cmakeBool "BUILD_PYTHON_INTERFACE" pythonSupport)
   ];
 
   doCheck = true;
@@ -62,11 +62,11 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
 
-  meta = with lib; {
+  meta = {
     description = "Extension of the Flexible Collision Library";
     homepage = "https://github.com/humanoid-path-planner/hpp-fcl";
-    license = licenses.bsd3;
-    maintainers = with maintainers; [ nim65s ];
-    platforms = platforms.unix;
+    license = lib.licenses.bsd3;
+    maintainers = [ lib.maintainers.nim65s ];
+    platforms = lib.platforms.unix;
   };
 })
