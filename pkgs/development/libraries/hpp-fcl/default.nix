@@ -11,6 +11,7 @@
 , qhull
 , pythonSupport ? false
 , python3Packages
+, zlib
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -37,6 +38,7 @@ stdenv.mkDerivation (finalAttrs: {
     jrl-cmakemodules
     qhull
     octomap
+    zlib
   ] ++ lib.optionals (!pythonSupport) [
     boost
     eigen
