@@ -9,7 +9,7 @@
   collisionSupport ? true,
   console-bridge,
   jrl-cmakemodules,
-  hpp-fcl,
+  coal,
   urdfdom,
   pythonSupport ? false,
   python3Packages,
@@ -61,12 +61,12 @@ stdenv.mkDerivation (_finalAttrs: {
       boost
       eigen
     ]
-    ++ lib.optionals (!pythonSupport && collisionSupport) [ hpp-fcl ]
+    ++ lib.optionals (!pythonSupport && collisionSupport) [ coal ]
     ++ lib.optionals pythonSupport [
       python3Packages.boost
       python3Packages.eigenpy
     ]
-    ++ lib.optionals (pythonSupport && collisionSupport) [ python3Packages.hpp-fcl ];
+    ++ lib.optionals (pythonSupport && collisionSupport) [ python3Packages.coal ];
 
   cmakeFlags = [
     (lib.cmakeBool "BUILD_PYTHON_INTERFACE" pythonSupport)

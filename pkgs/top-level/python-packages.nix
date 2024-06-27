@@ -5626,7 +5626,7 @@ self: super: with self; {
 
   hpp-environments = pkgs.hpp-environments.override { python3Packages = self; };
 
-  hpp-fcl = toPythonModule (pkgs.hpp-fcl.override {
+  coal = toPythonModule (pkgs.coal.override {
     pythonSupport = true;
     python3Packages = self;
   });

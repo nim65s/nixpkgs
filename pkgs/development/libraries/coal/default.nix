@@ -16,7 +16,7 @@
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "hpp-fcl";
+  pname = "coal";
   version = "3.0.0-pre";
 
   src = fetchFromGitHub {

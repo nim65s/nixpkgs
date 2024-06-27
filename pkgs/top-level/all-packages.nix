@@ -21043,7 +21043,7 @@ with pkgs;
 
   hound = callPackage ../development/tools/misc/hound { };
 
-  hpp-fcl = callPackage ../development/libraries/hpp-fcl { };
+  coal = callPackage ../development/libraries/coal { };
 
   hpx = callPackage ../development/libraries/hpx {
     boost = boost179;
