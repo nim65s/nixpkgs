@@ -10180,6 +10180,11 @@ self: super: with self; {
 
   propka = callPackage ../development/python-modules/propka { };
 
+  proxsuite = toPythonModule (pkgs.proxsuite.override {
+    pythonSupport = true;
+    python3Packages = self;
+  });
+
   proxy-tools = callPackage ../development/python-modules/proxy-tools { };
 
   proxy-db = callPackage ../development/python-modules/proxy-db { };
