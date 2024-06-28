@@ -20,9 +20,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   src = fetchFromGitHub {
     owner = "stack-of-tasks";
-    repo = finalAttrs.pname;
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-h4NzfS27+jWyHbegxF+pgN6JzJdVAoM16J6G/9uNJc4=";
+    repo = "pinocchio";
+    # after pinocchio#2284 for pin3+hpp
+    rev = "be4a8369b559c9a545f022b11517a89679d576af";
+    hash = "sha256-h5iwwRvvgE4O+tqLNVmLs7M6PdbFX2pvTGatDbXzhaQ=";
   };
 
   prePatch = ''
