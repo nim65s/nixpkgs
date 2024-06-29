@@ -19863,6 +19863,8 @@ with pkgs;
   gecode_6 = qt5.callPackage ../development/libraries/gecode { };
   gecode = gecode_6;
 
+  gepetto-gui = with python3Packages; gepetto-viewer.withPlugins [ ];
+
   geph = recurseIntoAttrs (callPackages ../applications/networking/geph { pnpm = pnpm_8; });
 
   gephi = callPackage ../applications/science/misc/gephi { };
