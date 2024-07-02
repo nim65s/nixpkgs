@@ -5610,6 +5610,8 @@ self: super: with self; {
 
   hpccm = callPackage ../development/python-modules/hpccm { };
 
+  hpp-centroidal-dynamics = pkgs.hpp-centroidal-dynamics.override { python3Packages = self; };
+
   hpp-fcl = toPythonModule (pkgs.hpp-fcl.override {
     pythonSupport = true;
     python3Packages = self;
