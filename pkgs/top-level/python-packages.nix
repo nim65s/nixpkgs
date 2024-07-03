@@ -5958,6 +5958,11 @@ self: super: with self; {
 
   hpccm = callPackage ../development/python-modules/hpccm { };
 
+  hpp-baxter = toPythonModule (pkgs.hpp-baxter.override {
+    pythonSupport = true;
+    python3Packages = self;
+  });
+
   hpp-bezier-com-traj = toPythonModule (pkgs.hpp-bezier-com-traj.override {
     pythonSupport = true;
     python3Packages = self;
