@@ -5544,6 +5544,8 @@ self: super: with self; {
 
   hpp-centroidal-dynamics = toPythonModule (pkgs.hpp-centroidal-dynamics.override { python3Packages = self; });
 
+  hpp-environments = toPythonModule (pkgs.hpp-environments.override { python3Packages = self; });
+
   hpp-fcl = toPythonModule (pkgs.hpp-fcl.override {
     pythonSupport = true;
     python3Packages = self;
