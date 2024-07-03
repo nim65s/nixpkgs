@@ -5610,6 +5610,8 @@ self: super: with self; {
 
   hpccm = callPackage ../development/python-modules/hpccm { };
 
+  hpp-baxter = pkgs.hpp-baxter.override { python3Packages = self; };
+
   hpp-bezier-com-traj = pkgs.hpp-bezier-com-traj.override { python3Packages = self; };
 
   hpp-centroidal-dynamics = pkgs.hpp-centroidal-dynamics.override { python3Packages = self; };
