@@ -6,6 +6,7 @@
 , boost
 , eigen
 , assimp
+, jrl-cmakemodules
 , octomap
 , qhull
 , pythonSupport ? false
@@ -14,14 +15,14 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "hpp-fcl";
-  version = "2.4.4";
+  version = "3.0.0";
 
   src = fetchFromGitHub {
     owner = "humanoid-path-planner";
     repo = "hpp-fcl";
-    rev = "v${finalAttrs.version}";
-    fetchSubmodules = true;
-    hash = "sha256-BwS9RSirdlD6Cqwp7KD59dkh2WsJVwdlH9LzM2AFjI4=";
+    #rev = "v${finalAttrs.version}";
+    rev = "d914b542761e6c4ee3308dce105256b0cf986f67";
+    hash = "sha256-u6nbTkYXqZXNsVSYHF2QiXmzrFFodv0Rcx77JNDbOyQ=";
   };
 
   strictDeps = true;
@@ -33,6 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   propagatedBuildInputs = [
     assimp
+    jrl-cmakemodules
     qhull
     octomap
   ] ++ lib.optionals (!pythonSupport) [
@@ -44,10 +46,10 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   cmakeFlags = [
-    "-DHPP_FCL_HAS_QHULL=ON"
+    "-DCOAL_BACKWARD_COMPATIBILITY_WITH_HPP_FCL=ON"
+    "-DCOAL_HAS_QHULL=ON"
     "-DINSTALL_DOCUMENTATION=ON"
-  ] ++ lib.optionals (!pythonSupport) [
-    "-DBUILD_PYTHON_INTERFACE=OFF"
+    (lib.cmakeBool "BUILD_PYTHON_INTERFACE" pythonSupport)
   ];
 
   doCheck = true;
