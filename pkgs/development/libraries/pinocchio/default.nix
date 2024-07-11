@@ -14,15 +14,17 @@
 , python3Packages
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   pname = "pinocchio";
   version = "3.1.0";
 
   src = fetchFromGitHub {
-    owner = "stack-of-tasks";
+    #owner = "stack-of-tasks";
+    owner = "nim65s";
     repo = "pinocchio";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-WgMqb+NHnaxW9/qSZ0UGI4zGxGjh12a5DwtdX9byBiw=";
+    #rev = "v${finalAttrs.version}";
+    rev = "7dd9c3e7f7a9ba43c35cb1e1e281b4fd411d0ae5";
+    hash = "sha256-HmHPemN0iCIgMLmcVrIAHAV/mPK63U7wuTZpweUaARk=";
   };
 
   #prePatch = lib.optionalString (stdenv.isLinux && stdenv.isAarch64) ''
