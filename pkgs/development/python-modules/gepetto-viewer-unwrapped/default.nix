@@ -1,5 +1,6 @@
 {
   buildPythonPackage,
+  stdenv,
   fetchFromGitHub,
   lib,
   boost,
@@ -27,7 +28,10 @@ buildPythonPackage rec {
     hash = "sha256-A2J3HidG+OHJO8LpLiOEvORxDtViTdeVD85AmKkkOg8=";
   };
 
-  cmakeFlags = [ "-DBUILD_PY_QCUSTOM_PLOT=ON" ];
+  cmakeFlags = [
+    (lib.cmakeBool "BUILD_PY_QCUSTOM_PLOT" (!stdenv.isDarwin))
+    (lib.cmakeBool "BUILD_PY_QGV" (!stdenv.isDarwin))
+  ];
 
   outputs = [
     "out"
