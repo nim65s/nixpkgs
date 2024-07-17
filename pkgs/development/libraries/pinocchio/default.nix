@@ -80,9 +80,6 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "BUILD_PYTHON_INTERFACE" pythonSupport)
     (lib.cmakeBool "BUILD_WITH_LIBPYTHON" pythonSupport)
     (lib.cmakeBool "BUILD_WITH_COLLISION_SUPPORT" collisionSupport)
-  ] ++ lib.optionals (pythonSupport && stdenv.isDarwin) [
-    # AssertionError: '.' != '/tmp/nix-build-pinocchio-2.7.0.drv/sou[84 chars].dae'
-    "-DCMAKE_CTEST_ARGUMENTS='--exclude-regex;test-py-bindings_geometry_model_urdf'"
   ];
 
   doCheck = true;
