@@ -1,11 +1,12 @@
 { lib
 , stdenv
 , fetchFromGitHub
+, fetchpatch
 , cmake
 , boost
 , eigen
 , example-robot-data
-, collisionSupport ? !stdenv.isDarwin
+, collisionSupport ? true
 , console-bridge
 , jrl-cmakemodules
 , hpp-fcl
@@ -30,6 +31,14 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace unittest/algorithm/utils/CMakeLists.txt \
       --replace-fail "add_pinocchio_unit_test(force)" ""
   '';
+
+  patches = [
+    (fetchpatch {
+      name = "static-pointer_cast.patch";
+      url = "https://github.com/nim65s/pinocchio/commit/ead869e8f3cce757851b9a011c4a2f55fb66582b.patch";
+      hash = "sha256-CkrWQJP/pPNs6B3a1FclfM7JWwkmsPzRumS46KQHv0s=";
+    })
+  ];
 
   # example-robot-data models are used in checks.
   # Upstream provide them as git submodule, but we can use our own version instead.
