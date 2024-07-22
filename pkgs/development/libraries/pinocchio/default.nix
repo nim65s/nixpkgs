@@ -19,22 +19,18 @@ stdenv.mkDerivation (_finalAttrs: {
   version = "3.1.0";
 
   src = fetchFromGitHub {
-    #owner = "stack-of-tasks";
-    owner = "nim65s";
+    owner = "stack-of-tasks";
     repo = "pinocchio";
     #rev = "v${finalAttrs.version}";
-    rev = "7dd9c3e7f7a9ba43c35cb1e1e281b4fd411d0ae5";
-    hash = "sha256-HmHPemN0iCIgMLmcVrIAHAV/mPK63U7wuTZpweUaARk=";
+    rev = "edfd51787d793500cc1f7a05f82bb3d98c456b57";
+    hash = "sha256-ybPQjzHrWI8nxCW71uJZ4z24y8HcSzEnGnr/aPF2LqQ=";
   };
 
-  #prePatch = lib.optionalString (stdenv.isLinux && stdenv.isAarch64) ''
-    ## test failure, ref https://github.com/stack-of-tasks/pinocchio/issues/2304
-    #substituteInPlace unittest/CMakeLists.txt \
-      #--replace-fail "add_pinocchio_unit_test(contact-models)" ""
-    ## test failure, ref https://github.com/stack-of-tasks/pinocchio/issues/2277
-    #substituteInPlace unittest/algorithm/utils/CMakeLists.txt \
-      #--replace-fail "add_pinocchio_unit_test(force)" ""
-  #'';
+  # test failure, ref https://github.com/stack-of-tasks/pinocchio/issues/2277
+  prePatch = lib.optionalString (stdenv.isLinux && stdenv.isAarch64) ''
+    substituteInPlace unittest/algorithm/utils/CMakeLists.txt \
+      --replace-fail "add_pinocchio_unit_test(force)" ""
+  '';
 
   # example-robot-data models are used in checks.
   # Upstream provide them as git submodule, but we can use our own version instead.
