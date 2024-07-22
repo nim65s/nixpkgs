@@ -1,7 +1,6 @@
 { lib
 , stdenv
 , fetchFromGitHub
-, fetchpatch
 , cmake
 , boost
 , eigen
@@ -24,8 +23,8 @@ stdenv.mkDerivation (_finalAttrs: {
     owner = "nim65s";
     repo = "pinocchio";
     #rev = "v${finalAttrs.version}";
-    rev = "7dd9c3e7f7a9ba43c35cb1e1e281b4fd411d0ae5";
-    hash = "sha256-HmHPemN0iCIgMLmcVrIAHAV/mPK63U7wuTZpweUaARk=";
+    rev = "65657a335d09fc0407f68296a99cfc6f03788bc5";
+    hash = "sha256-5DwUNvYokZ+EBaz1twySt0OREvxn6gmzIN/j+qlZziI=";
   };
 
   # test failure, ref https://github.com/stack-of-tasks/pinocchio/issues/2277
@@ -33,15 +32,6 @@ stdenv.mkDerivation (_finalAttrs: {
     substituteInPlace unittest/algorithm/utils/CMakeLists.txt \
       --replace-fail "add_pinocchio_unit_test(force)" ""
   '';
-
-  patches = [
-    # fix urdf & collision support on aarch64-darwin
-    (fetchpatch {
-      name = "static-pointer_cast.patch";
-      url = "https://github.com/stack-of-tasks/pinocchio/pull/2339/commits/ead869e8f3cce757851b9a011c4a2f55fb66582b.patch";
-      hash = "sha256-CkrWQJP/pPNs6B3a1FclfM7JWwkmsPzRumS46KQHv0s=";
-    })
-  ];
 
   # example-robot-data models are used in checks.
   # Upstream provide them as git submodule, but we can use our own version instead.
