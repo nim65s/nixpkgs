@@ -19,11 +19,12 @@ stdenv.mkDerivation (finalAttrs: {
   version = "3.0.0";
 
   src = fetchFromGitHub {
-    owner = "humanoid-path-planner";
+    #owner = "humanoid-path-planner";
+    owner = "nim65s";
     repo = "hpp-fcl";
     #rev = "v${finalAttrs.version}";
-    rev = "d914b542761e6c4ee3308dce105256b0cf986f67";
-    hash = "sha256-u6nbTkYXqZXNsVSYHF2QiXmzrFFodv0Rcx77JNDbOyQ=";
+    rev = "dc1105eb092c03eeb52d3655638f013dfe0426da";
+    hash = "sha256-pAqP65pBYI9mJdfwj8r8eaj2vg+2DSi9aUX6+f2yI14=";
   };
 
   strictDeps = true;
