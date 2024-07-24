@@ -23,8 +23,8 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "nim65s";
     repo = "hpp-fcl";
     #rev = "v${finalAttrs.version}";
-    rev = "bc5a2f69";
-    hash = "sha256-LxaAZqALNm37KTaqr3dvqCp/Mp0YH+9el6lZklLxmRY=";
+    rev = "3e7eaacd";
+    hash = "sha256-CYcDs3pTXD++w+M3fV8YdPJbsXBDKZOwyH3fXWjJUi8=";
   };
 
   strictDeps = true;
