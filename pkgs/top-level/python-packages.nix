@@ -9296,6 +9296,11 @@ self: super: with self; {
 
   odp-amsterdam = callPackage ../development/python-modules/odp-amsterdam { };
 
+  odri-control-interface = toPythonModule (pkgs.odri-control-interface.override {
+    pythonSupport = true;
+    python3Packages = self;
+  });
+
   odri-master-board-sdk = toPythonModule (pkgs.odri-master-board-sdk.override {
     pythonSupport = true;
     python3Packages = self;
