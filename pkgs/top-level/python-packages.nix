@@ -5942,6 +5942,8 @@ self: super: with self; {
     python3Packages = self;
   });
 
+  hpp-corbaserver = toPythonModule (pkgs.hpp-corbaserver.override { python3Packages = self; });
+
   hpp-environments = toPythonModule (pkgs.hpp-environments.override {
     pythonSupport = true;
     python3Packages = self;
