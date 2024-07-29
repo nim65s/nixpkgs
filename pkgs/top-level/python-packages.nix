@@ -5643,7 +5643,7 @@ self: super: with self; {
 
   hpp-plot = pkgs.hpp-plot.override { python3Packages = self; };
 
-  hpp-romeo = pkgs.hpp-romeo.override { python3Packages = self; };
+  hpp-practicals = pkgs.hpp-practicals.override { python3Packages = self; };
 
   hpp-tutorial = pkgs.hpp-tutorial.override { python3Packages = self; };
 
