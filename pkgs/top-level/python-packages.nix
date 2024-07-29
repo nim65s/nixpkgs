@@ -5671,6 +5671,8 @@ self: super: with self; {
 
   hpp-manipulation = pkgs.hpp-manipulation.override { python3Packages = self; };
 
+  hpp-manipulation-corba = pkgs.hpp-manipulation-corba.override { python3Packages = self; };
+
   hpp-manipulation-urdf = pkgs.hpp-manipulation-urdf.override { python3Packages = self; };
 
   hpp-pinocchio = pkgs.hpp-pinocchio.override { python3Packages = self; };
