@@ -5949,6 +5949,8 @@ self: super: with self; {
     python3Packages = self;
   });
 
+  hpp-gepetto-viewer = toPythonModule (pkgs.hpp-gepetto-viewer.override { python3Packages = self; });
+
   hpp-romeo = toPythonModule (pkgs.hpp-romeo.override {
     pythonSupport = true;
     python3Packages = self;
