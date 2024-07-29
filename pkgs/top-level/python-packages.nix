@@ -5852,6 +5852,11 @@ self: super: with self; {
     python3Packages = self;
   });
 
+  hpp-universal-robot = toPythonModule (pkgs.hpp-universal-robot.override {
+    pythonSupport = true;
+    python3Packages = self;
+  });
+
   hs-dbus-signature = callPackage ../development/python-modules/hs-dbus-signature { };
 
   hsaudiotag3k = callPackage ../development/python-modules/hsaudiotag3k { };
