@@ -1,8 +1,6 @@
 {
-  buildPythonPackage,
   fetchFromGitHub,
   lib,
-  boost,
   cmake,
   doxygen,
   gepetto-viewer-unwrapped,
@@ -12,7 +10,7 @@
   libsForQt5,
 }:
 
-buildPythonPackage rec {
+python3Packages.buildPythonPackage rec {
   pname = "gepetto-viewer-corba";
   version = "5.8.0";
   pyproject = false; # CMake
@@ -36,7 +34,6 @@ buildPythonPackage rec {
   '';
 
   buildInputs = [
-    boost
     omniorb
     libsForQt5.qtbase
   ];
@@ -49,7 +46,7 @@ buildPythonPackage rec {
   ];
 
   propagatedBuildInputs = [
-    gepetto-viewer-unwrapped
+    python3Packages.gepetto-viewer-unwrapped
     python3Packages.boost
     python3Packages.omniorbpy
   ];
