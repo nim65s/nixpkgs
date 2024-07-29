@@ -1,18 +1,19 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, fetchpatch
-, cmake
-, boost
-, eigen
-, example-robot-data
-, collisionSupport ? true
-, console-bridge
-, jrl-cmakemodules
-, hpp-fcl
-, urdfdom
-, pythonSupport ? false
-, python3Packages
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  cmake,
+  boost,
+  eigen,
+  example-robot-data,
+  collisionSupport ? true,
+  console-bridge,
+  jrl-cmakemodules,
+  hpp-fcl,
+  urdfdom,
+  pythonSupport ? false,
+  python3Packages,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -57,25 +58,24 @@ stdenv.mkDerivation (finalAttrs: {
 
   strictDeps = true;
 
-  nativeBuildInputs = [
-    cmake
-  ];
+  nativeBuildInputs = [ cmake ];
 
-  propagatedBuildInputs = [
-    console-bridge
-    jrl-cmakemodules
-    urdfdom
-  ] ++ lib.optionals (!pythonSupport) [
-    boost
-    eigen
-  ] ++ lib.optionals (!pythonSupport && collisionSupport) [
-    hpp-fcl
-  ] ++ lib.optionals pythonSupport [
-    python3Packages.boost
-    python3Packages.eigenpy
-  ] ++ lib.optionals (pythonSupport && collisionSupport) [
-    python3Packages.hpp-fcl
-  ];
+  propagatedBuildInputs =
+    [
+      console-bridge
+      jrl-cmakemodules
+      urdfdom
+    ]
+    ++ lib.optionals (!pythonSupport) [
+      boost
+      eigen
+    ]
+    ++ lib.optionals (!pythonSupport && collisionSupport) [ hpp-fcl ]
+    ++ lib.optionals pythonSupport [
+      python3Packages.boost
+      python3Packages.eigenpy
+    ]
+    ++ lib.optionals (pythonSupport && collisionSupport) [ python3Packages.hpp-fcl ];
 
   cmakeFlags = [
     (lib.cmakeBool "BUILD_PYTHON_INTERFACE" pythonSupport)
@@ -85,15 +85,16 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = true;
 
-  pythonImportsCheck = lib.optionals (!pythonSupport) [
-    "pinocchio"
-  ];
+  pythonImportsCheck = lib.optionals (!pythonSupport) [ "pinocchio" ];
 
   meta = {
     description = "Fast and flexible implementation of Rigid Body Dynamics algorithms and their analytical derivatives";
     homepage = "https://github.com/stack-of-tasks/pinocchio";
     license = lib.licenses.bsd2;
-    maintainers = with lib.maintainers; [ nim65s wegank ];
+    maintainers = with lib.maintainers; [
+      nim65s
+      wegank
+    ];
     platforms = lib.platforms.unix;
   };
 })
