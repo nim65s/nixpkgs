@@ -5618,6 +5618,8 @@ self: super: with self; {
 
   hpp-constraints = pkgs.hpp-constraints.override { python3Packages = self; };
 
+  hpp-corbaserver = pkgs.hpp-corbaserver.override { python3Packages = self; };
+
   hpp-core = pkgs.hpp-core.override { python3Packages = self; };
 
   hpp-environments = pkgs.hpp-environments.override { python3Packages = self; };
