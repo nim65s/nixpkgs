@@ -5622,6 +5622,8 @@ self: super: with self; {
 
   hpp-core = pkgs.hpp-core.override { python3Packages = self; };
 
+  hpp-doc = pkgs.hpp-doc.override { python3Packages = self; };
+
   hpp-environments = pkgs.hpp-environments.override { python3Packages = self; };
 
   hpp-fcl = toPythonModule (pkgs.hpp-fcl.override {
