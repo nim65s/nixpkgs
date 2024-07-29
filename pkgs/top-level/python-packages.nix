@@ -5631,6 +5631,8 @@ self: super: with self; {
 
   hpp-gepetto-viewer = pkgs.hpp-gepetto-viewer.override { python3Packages = self; };
 
+  hpp-gui = pkgs.hpp-gui.override { python3Packages = self; };
+
   hpp-manipulation = pkgs.hpp-manipulation.override { python3Packages = self; };
 
   hpp-manipulation-corba = pkgs.hpp-manipulation-corba.override { python3Packages = self; };
