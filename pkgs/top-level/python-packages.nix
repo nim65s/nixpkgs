@@ -5645,6 +5645,8 @@ self: super: with self; {
 
   hpp-romeo = pkgs.hpp-romeo.override { python3Packages = self; };
 
+  hpp-tutorial = pkgs.hpp-tutorial.override { python3Packages = self; };
+
   hpp-universal-robot = pkgs.hpp-universal-robot.override { python3Packages = self; };
 
   hs-dbus-signature = callPackage ../development/python-modules/hs-dbus-signature { };
