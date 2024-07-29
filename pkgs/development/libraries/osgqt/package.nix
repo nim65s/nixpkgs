@@ -7,7 +7,9 @@
   qtbase,
   wrapQtAppsHook,
 }:
-
+let
+  osg = openscenegraph.override { colladaSupport = true; };
+in
 stdenv.mkDerivation (finalAttrs: {
   pname = "osgQt";
   version = "3.5.7";
@@ -26,7 +28,7 @@ stdenv.mkDerivation (finalAttrs: {
     wrapQtAppsHook
   ];
 
-  propagatedBuildInputs = [ openscenegraph ];
+  propagatedBuildInputs = [ osg ];
 
   cmakeFlags = [
     "-DDESIRED_QT_VERSION=5"
