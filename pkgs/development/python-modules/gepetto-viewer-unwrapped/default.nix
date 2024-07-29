@@ -1,9 +1,7 @@
 {
-  buildPythonPackage,
   stdenv,
   fetchFromGitHub,
   lib,
-  boost,
   cmake,
   darwin,
   doxygen,
@@ -13,11 +11,12 @@
   osgqt,
   pkg-config,
   python3Packages,
-  python-qt,
   qgv,
 }:
-
-buildPythonPackage rec {
+let
+  osg = openscenegraph.override { colladaSupport = true; };
+in
+python3Packages.buildPythonPackage rec {
   pname = "gepetto-viewer";
   version = "5.1.0";
   pyproject = false; # CMake
@@ -40,12 +39,10 @@ buildPythonPackage rec {
   ];
 
   buildInputs = [
-    boost
-    python-qt
+    python3Packages.boost
+    python3Packages.python-qt
     libsForQt5.qtbase
     osgqt
-    python3Packages.boost
-    python3Packages.python
   ];
 
   nativeBuildInputs = [
@@ -57,7 +54,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [
     jrl-cmakemodules
-    openscenegraph
+    osg
     osgqt
     qgv
   ];

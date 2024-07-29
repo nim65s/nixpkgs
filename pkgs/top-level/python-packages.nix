@@ -4877,7 +4877,8 @@ self: super: with self; {
 
   gepetto-viewer-corba = callPackage ../development/python-modules/gepetto-viewer-corba { };
 
-  gepetto-viewer-unwrapped = callPackage ../development/python-modules/gepetto-viewer-unwrapped { };
+  gepetto-viewer-unwrapped = callPackage ../development/python-modules/gepetto-viewer-unwrapped { python3Packages =
+    self; };
 
   gerbonara = callPackage ../development/python-modules/gerbonara { };
 
