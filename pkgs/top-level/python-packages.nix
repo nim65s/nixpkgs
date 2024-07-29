@@ -5629,6 +5629,8 @@ self: super: with self; {
     python3Packages = self;
   });
 
+  hpp-gepetto-viewer = pkgs.hpp-gepetto-viewer.override { python3Packages = self; };
+
   hpp-pinocchio = pkgs.hpp-pinocchio.override { python3Packages = self; };
 
   hpp-romeo = pkgs.hpp-romeo.override { python3Packages = self; };
