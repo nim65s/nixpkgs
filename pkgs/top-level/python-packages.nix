@@ -5629,6 +5629,8 @@ self: super: with self; {
 
   hpp-pinocchio = pkgs.hpp-pinocchio.override { python3Packages = self; };
 
+  hpp-universal-robot = pkgs.hpp-universal-robot.override { python3Packages = self; };
+
   hs-dbus-signature = callPackage ../development/python-modules/hs-dbus-signature { };
 
   hsaudiotag3k = callPackage ../development/python-modules/hsaudiotag3k { };
