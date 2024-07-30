@@ -39,7 +39,8 @@ python3Packages.buildPythonPackage rec {
 
   enableParallelBuilding = false;
 
-  doCheck = true;
+  # psmisc is only available on linux
+  doCheck = stdenv.isLinux;
 
   pythonImportsCheck = [ "hpp.corbaserver" ];
 
