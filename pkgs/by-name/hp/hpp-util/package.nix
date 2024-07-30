@@ -1,5 +1,6 @@
 {
   fetchFromGitHub,
+  fetchpatch,
   lib,
   stdenv,
   boost,
@@ -18,6 +19,13 @@ stdenv.mkDerivation (finalAttrs: {
     rev = "v${finalAttrs.version}";
     hash = "sha256-cYONa7WTagNZCITtocdII+WcfdzZnvznFUyb7YLodIw=";
   };
+
+  patches = [
+    (fetchpatch {
+      url = "https://github.com/humanoid-path-planner/hpp-util/pull/68/commits/e67e465c06d81ce13bcd11441f777ca8b02fa7be.patch";
+      hash = "sha256-C2coY1CBu4bONnas4GPZImyxuImBZ+HVIE1qdMdL9uM=";
+    })
+  ];
 
   prePatch = ''
     substituteInPlace tests/run_debug.sh.in \
