@@ -2,6 +2,7 @@
   cmake,
   example-robot-data,
   fetchFromGitHub,
+  fetchpatch,
   lib,
   python3Packages,
 }:
@@ -17,6 +18,13 @@ python3Packages.buildPythonPackage rec {
     rev = "v${version}";
     hash = "sha256-Qthm+u6YW9e/5i2UrXDBMwecGWVNY9FuDMw3K4BHgIk=";
   };
+
+  patches = [
+    (fetchpatch {
+      url = "https://github.com/humanoid-path-planner/hpp-manipulation-urdf/pull/63/commits/f79aa07339e7ad57a9752c8c3742caa39ac5131f.patch";
+      hash = "sha256-qBeg/PJryCmYn1iQB2Zx9x9CUshsemIP/Ls2VRBQf/4=";
+    })
+  ];
 
   strictDeps = true;
 
