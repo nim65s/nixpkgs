@@ -1,6 +1,7 @@
 {
   cmake,
   fetchFromGitHub,
+  fetchpatch,
   hpp-template-corba,
   lib,
   pkg-config,
@@ -20,6 +21,13 @@ python3Packages.buildPythonPackage rec {
     rev = "v${version}";
     hash = "sha256-qFcBT/YDTsrAzEE//JmCbk1TnVrnYcme1WCzkPaXwZ0=";
   };
+
+  patches = [
+    (fetchpatch {
+      url = "https://github.com/humanoid-path-planner/hpp-corbaserver/pull/232/commits/8fcf05c9d5cad9477a3b7b2522a3ba5f11fe59e4.patch";
+      hash = "sha256-uvTaV3jbJc8mYoKZWIVWgWrdihbqt6dhLVZ/kdjxOjA=";
+    })
+  ];
 
   prePatch = ''
     substituteInPlace tests/hppcorbaserver.sh \
