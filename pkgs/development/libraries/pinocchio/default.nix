@@ -1,10 +1,12 @@
 { lib
 , stdenv
 , fetchFromGitHub
+, casadi
 , cmake
 , boost
 , eigen
 , example-robot-data
+, casadiSupport ? true
 , collisionSupport ? !stdenv.isDarwin
 , console-bridge
 , jrl-cmakemodules
@@ -38,11 +40,14 @@ stdenv.mkDerivation (finalAttrs: {
       --replace-fail "add_pinocchio_unit_test(force)" ""
   '';
 
-  # example-robot-data models are used in checks.
-  # Upstream provide them as git submodule, but we can use our own version instead.
   postPatch = ''
+    # example-robot-data models are used in checks.
+    # Upstream provide them as git submodule, but we can use our own version instead.
     rmdir models/example-robot-data
     ln -s ${example-robot-data.src} models/example-robot-data
+
+    # allow package:// uri use in examples
+    export ROS_PACKAGE_PATH=${example-robot-data}/share
   '';
 
   strictDeps = true;
@@ -65,11 +70,18 @@ stdenv.mkDerivation (finalAttrs: {
     python3Packages.eigenpy
   ] ++ lib.optionals (pythonSupport && collisionSupport) [
     python3Packages.hpp-fcl
+  ] ++ lib.optionals (!pythonSupport && casadiSupport) [
+    casadi
+  ] ++ lib.optionals (pythonSupport && casadiSupport) [
+    python3Packages.casadi
   ];
+
+  checkInputs = lib.optionals (pythonSupport && casadiSupport) [ python3Packages.matplotlib ];
 
   cmakeFlags = [
     (lib.cmakeBool "BUILD_PYTHON_INTERFACE" pythonSupport)
     (lib.cmakeBool "BUILD_WITH_LIBPYTHON" pythonSupport)
+    (lib.cmakeBool "BUILD_WITH_CASADI_SUPPORT" casadiSupport)
     (lib.cmakeBool "BUILD_WITH_COLLISION_SUPPORT" collisionSupport)
   ] ++ lib.optionals (pythonSupport && stdenv.isDarwin) [
     # AssertionError: '.' != '/tmp/nix-build-pinocchio-2.7.0.drv/sou[84 chars].dae'
