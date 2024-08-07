@@ -24,8 +24,6 @@ stdenv.mkDerivation rec {
   };
 
   CXXDEFS = [ "-DHAVE_RAND" "-DHAVE_CSTRING" "-DHAVE_CSTDIO" ];
-  LIBS = lib.optionals enableMUMPS [ "-lmpi_cxx" ];
-  CPPFLAGS = lib.optionals enableMUMPS [ "-I${mpi}/include" ];
 
   configureFlags = lib.optionals enableAMPL [
     "--with-asl-cflags=-I${libamplsolver}/include"
@@ -42,8 +40,7 @@ stdenv.mkDerivation rec {
   buildInputs = [ blas lapack ]
     ++ lib.optionals enableAMPL [ libamplsolver ]
     ++ lib.optionals enableMUMPS [ mumps mpi ]
-    ++ lib.optionals enableSPRAL [ spral ]
-  ;
+    ++ lib.optionals enableSPRAL [ spral ];
 
   enableParallelBuilding = true;
 
