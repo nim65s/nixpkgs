@@ -38,6 +38,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   makeFlags = lib.optionals stdenv.isDarwin [
     "SONAME="
+    "LIBEXT_SHARED=.dylib"
   ] ++ [
     "LSCOTCHDIR=${scotch}/lib"
     "ISCOTCH=-I${scotch}/include"
