@@ -36,7 +36,9 @@ stdenv.mkDerivation (finalAttrs: {
     cp Make.inc/Makefile.debian.SEQ ./Makefile.inc
   '';
 
-  makeFlags = [
+  makeFlags = lib.optionals stdenv.isDarwin [
+    "SONAME="
+  ] ++ [
     "LSCOTCHDIR=${scotch}/lib"
     "ISCOTCH=-I${scotch}/include"
     "LMETISDIR=${metis}/lib"
