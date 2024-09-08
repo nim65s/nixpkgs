@@ -32210,6 +32210,10 @@ with pkgs;
 
   typora = callPackage ../applications/editors/typora { };
 
+  typst-packages = callPackage ../development/typst-modules/package.nix { };
+
+  typst-a2c-nums = callPackage ../development/typst-modules/a2c-nums/0.0.1/package.nix { };
+
   taxi = callPackage ../applications/networking/ftp/taxi { };
 
   taxi-cli = with python3Packages; toPythonApplication taxi;
