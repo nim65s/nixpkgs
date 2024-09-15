@@ -4,8 +4,8 @@
   esp-clang,
   esp-rom-elfs,
   esp32ulp-elf,
-  fetchFromGitHub,
   fetchpatch,
+  fetchzip,
   jq,
   lib,
   ninja,
@@ -24,22 +24,13 @@ stdenv.mkDerivation {
   inherit (sourceInfo) version;
   pname = "esp-idf";
 
-  src = fetchFromGitHub {
-    owner = "espressif";
-    repo = "esp-idf";
-    rev = "v${sourceInfo.version}";
-    hash = "sha256-w+xyva4t21STVtfYZOXY2xw6sDc2XvJXBZSx+wd1N6Y=";
-    fetchSubmodules = true;
+  src = fetchzip {
+    inherit (sourceInfo) hash url;
   };
 
   patches = [
-    # ref. https://github.com/espressif/esp-idf/pull/14402
-    # but this does not apply directly on v5.3
-    (fetchpatch {
-      name = "remove-distutils.patch";
-      url = "https://github.com/nim65s/esp-idf/commit/e61eea3916f1e04eda52929e6a6ef81508dcc1d4.patch";
-      hash = "sha256-BcI/pjItdBzYy3RvQUp2LW2o1tHLEYFJhP0WGUv7FvM=";
-    })
+    # don't require venv when nix python env is used
+    # ref. https://github.com/espressif/esp-idf/pull/14435
     (fetchpatch {
       name = "fix-venv-detection.patch";
       url = "https://github.com/espressif/esp-idf/pull/14435/commits/c25b563061af37df8b403c9e973ac53685ec7011.patch";
