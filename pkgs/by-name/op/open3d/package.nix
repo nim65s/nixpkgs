@@ -13,16 +13,18 @@
   jsoncpp,
   lib,
   liblzf,
+  libjpeg,
   libpng,
+  librealsense,
   nanoflann,
   python3Packages,
   qhull,
   stdenv,
   tinygltf,
   tinyobjloader,
-  withExamples ? false,
+  withExamples ? true,
   withCuda ? false,
-  withPython ? false,
+  withPython ? true,
   withGui ? true,
 }:
 
@@ -51,13 +53,17 @@ stdenv.mkDerivation (finalAttrs: {
     gtest
     imgui
     jsoncpp
-    libpng
+    libjpeg
     liblzf
+    libpng
+    librealsense
     nanoflann
-    python3Packages.python
     qhull
     tinygltf
     tinyobjloader
+  ] ++ lib.optionals withPython [
+    python3Packages.pybind11
+    python3Packages.python
   ];
 
   cmakeFlags = [
@@ -66,7 +72,7 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "BUILD_PYTHON_MODULE" withPython)
     (lib.cmakeBool "BUILD_GUI" withGui)
     (lib.cmakeBool "BUILD_WEBRTC" withGui)
-    (lib.cmakeBool "BUILD_JUPYTER_EXTENSION" withGui)
+    (lib.cmakeBool "BUILD_JUPYTER_EXTENSION" (withGui && withPython))
     "-DBUILD_SHARED_LIBS=ON"
     "-DBUILD_UNIT_TESTS=ON"
     #"-DBUILD_ISPC_MODULE=OFF" # TODO: it really tries to fetch stuff
