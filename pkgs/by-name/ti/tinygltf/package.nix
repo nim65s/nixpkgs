@@ -25,8 +25,8 @@ stdenv.mkDerivation (finalAttrs: {
     })
     # CMake: fix export install dir
     (fetchpatch {
-      url = "https://github.com/syoyo/tinygltf/pull/503/commits/e2465a83dcbdb9fea85e2f1fd3ca35e06757aeb3.patch";
-      hash = "sha256-ZIiLpltn97Rz+Acjfgr+JPGYa8TQnu/i4hDOU6o5M/8=";
+      url = "https://github.com/syoyo/tinygltf/pull/503/commits/8bec43169904a713b1ff9db1e9186a072bca741a.patch";
+      hash = "sha256-hORzdWqyV8bCTgWw2na/aiDKLlSi++X9eMng2TTjmYI=";
     })
   ];
 
