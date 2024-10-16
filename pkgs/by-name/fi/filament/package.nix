@@ -1,68 +1,88 @@
 {
-  lib,
+  cmake,
   clangStdenv,
   fetchFromGitHub,
-  cmake,
-  python3Packages,
-  libglvnd,
+  fetchpatch,
+  lib,
   libcxx,
-  libXi,
-  libXcomposite,
-  libXxf86vm,
+  libffi,
+  libglvnd,
   libX11,
+  libXcomposite,
+  libxkbcommon,
+  libXi,
+  libXxf86vm,
+  pkg-config,
+  python3Packages,
+  # TODO : withWayland broken, because:
+  # > No rule to make target '//nix/store/cdnwvy5zyh6la8x1cal00xmvsj8x3dai-wayland-1.23.1/share/wayland/wayland.xml',
+  # > needed by 'autogen/wayland/wayland-client-protocol.c'.  Stop.
+  withWayland ? false,
+  wayland,
+  wayland-protocols,
+  wayland-scanner,
 }:
 
-clangStdenv.mkDerivation rec {
+clangStdenv.mkDerivation (finalAttrs: {
   pname = "filament";
-  version = "1.53.1";
+  version = "1.55.0";
 
   src = fetchFromGitHub {
     owner = "google";
     repo = "filament";
-    rev = "v${version}";
-    hash = "sha256-CR2y92lBPHs6Idxbbj4P913TBQwIi7ZAEV2oK/eBw20=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-0LJMB6mWouXylFsTjBfeeQmRkhr5FjNZKfF47M+AxPM=";
   };
+
+  patches = [
+    # Fix missing includes
+    (fetchpatch {
+      url = "https://github.com/google/filament/pull/8205/commits/ea23430f3582c1a84049da671c1d9a5a6031e1d8.patch";
+      hash = "sha256-LBxzETcYB5NlP62sSv3mPkSdw8TdAMCCWzlbEtElxRY=";
+    })
+  ];
+
+  postPatch = ''
+    patchShebangs --build build/linux/combine-static-libs.sh
+  '';
 
   nativeBuildInputs = [
     cmake
     python3Packages.python
-    libglvnd
-    libcxx
-    libXi
-    libXcomposite
-    libXxf86vm
-    libX11
-  ];
+    pkg-config
+  ] ++ lib.optional (clangStdenv.isLinux && withWayland) wayland-scanner;
 
-  postPatch = ''
-    substituteInPlace third_party/draco/src/draco/io/file_utils.h \
-      --replace-fail "#include <vector>" "#include <vector>
-      #include <cstdint>"
-    substituteInPlace tools/glslminifier/src/GlslMinify.h \
-      --replace-fail "#include <string>" "#include <string>
-      #include <cstdint>"
-    substituteInPlace libs/utils/include/utils/memalign.h \
-      --replace-fail "::posix_memalign" "std::ignore = ::posix_memalign" \
-      --replace-fail "#include <type_traits>" "#include <type_traits>
-      #include <tuple>"
-    substituteInPlace libs/gltfio/src/extended/TangentsJobExtended.cpp \
-      --replace-fail "#include <memory>" "#include <memory>
-      #include <cstring>"
-    patchShebangs --build build/linux/combine-static-libs.sh
-  '';
+  buildInputs =
+    [
+      libcxx
+      libffi
+      libglvnd
+    ]
+    ++ lib.optionals (clangStdenv.isLinux && !withWayland) [
+      libXi
+      libXcomposite
+      libxkbcommon
+      libXxf86vm
+      libX11
+    ]
+    ++ lib.optionals (clangStdenv.isLinux && withWayland) [
+      wayland
+      wayland-protocols
+    ];
 
   cmakeFlags = [
-    (lib.cmakeBool "USE_STATIC_LIBCXX" clangStdenv.isDarwin)
+    (lib.cmakeBool "FILAMENT_ENABLE_LTO" true)
     (lib.cmakeBool "FILAMENT_SUPPORTS_METAL" clangStdenv.isDarwin)
-    (lib.cmakeBool "FILAMENT_SUPPORTS_VULKAN" clangStdenv.isDarwin)
+    (lib.cmakeBool "FILAMENT_SUPPORTS_VULKAN" clangStdenv.isLinux)
+    (lib.cmakeBool "FILAMENT_SUPPORTS_WAYLAND" (clangStdenv.isLinux && withWayland))
+    (lib.cmakeBool "USE_STATIC_LIBCXX" clangStdenv.isDarwin)
   ];
 
   meta = with lib; {
-    description = "Filament is a real-time physically based rendering engine for Android, iOS, Windows, Linux, macOS, and WebGL2";
+    description = "Real-time physically based rendering engine for Android, iOS, Windows, Linux, macOS, and WebGL2";
     homepage = "https://github.com/google/filament";
     license = licenses.asl20;
     maintainers = with maintainers; [ nim65s ];
-    mainProgram = "filament";
-    platforms = platforms.all;
+    platforms = platforms.unix ++ platforms.windows;
   };
-}
+})
