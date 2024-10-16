@@ -17,6 +17,7 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-s3RlaDlCkNgbe2sl4TjYKkNLMWqEAGHGWNEV8Z3TH7Y=";
   };
 
+  # Those patches have been merged upstream and can be removed on next release
   patches = [
     # CMake: allow opt-out of installing vendored headers
     (fetchpatch {
