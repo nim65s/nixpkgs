@@ -37,8 +37,8 @@ clangStdenv.mkDerivation (finalAttrs: {
   patches = [
     # Fix missing includes
     (fetchpatch {
-      url = "https://github.com/google/filament/pull/8205/commits/ea23430f3582c1a84049da671c1d9a5a6031e1d8.patch";
-      hash = "sha256-LBxzETcYB5NlP62sSv3mPkSdw8TdAMCCWzlbEtElxRY=";
+      url = "https://github.com/google/filament/pull/8205/commits/f7e58ef1fa042a5c16a74d2d44ac941923db9627.patch";
+      hash = "sha256-AltRBbl6KwYUsG9JjhACKWlt3hwGNc7V8Mhv8oDYpVA=";
     })
   ];
 
