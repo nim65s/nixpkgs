@@ -1,7 +1,12 @@
 {
   assimp,
+  boost,
+  #boringssl,
   cmake,
+  cudaPackages,
+  curl,
   eigen,
+  embree,
   fetchFromGitHub,
   fetchpatch,
   filament,
@@ -11,23 +16,32 @@
   glfw,
   gtest,
   imgui,
+  ispc,
   jsoncpp,
   lib,
-  liblzf,
+  libGL,
   libjpeg,
+  liblzf,
   libpng,
   librealsense,
+  msgpack,
+  msgpack-cxx,
   nanoflann,
-  openssl,
+  opensycl,
+  pkg-config,
   python3Packages,
   qhull,
   stdenv,
+  tbb,
   tinygltf,
   tinyobjloader,
+  vtk,
   withExamples ? true,
   withCuda ? false,
   withPython ? true,
   withGui ? true,
+  zeromq,
+  zlib,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -57,32 +71,63 @@ stdenv.mkDerivation (finalAttrs: {
     })
   ];
 
+  postPatch = ''
+    # avoid fetch FetchContent on
+    # https://github.com/isl-org/open3d_downloads/releases/download/mesa-libgl/mesa_libGL_22.1.4.tar.bz2
+    substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
+      "if(BUILD_GUI AND UNIX AND NOT APPLE)" \
+      "if(BUILD_GUI AND UNIX AND NOT APPLE)
+         set(MESA_CPU_GL_LIBRARY ${lib.getLib libGL}/lib/libGL.so)
+       else()"
+
+    # avoid fetch ISPC
+    substituteInPlace CMakeLists.txt --replace-fail \
+      'open3d_fetch_ispc_compiler()' \
+      'set(CMAKE_ISPC_COMPILER "${lib.getExe ispc}")'
+  '';
+
   nativeBuildInputs = [
     cmake
     git
+    pkg-config
   ];
   buildInputs = [
     assimp
+    boost
+    #boringssl
+    curl
     eigen
+    embree
     filament
     fmt
     glew
     glfw
     gtest
     imgui
+    ispc
     jsoncpp
+    libGL
     libjpeg
     liblzf
     libpng
     librealsense
+    msgpack
+    msgpack-cxx
     nanoflann
-    #openssl
+    opensycl
     qhull
+    tbb
     tinygltf
     tinyobjloader
+    vtk
+    zeromq
+    zlib
+  ] ++ lib.optionals withCuda [
+    cudaPackages.cuda_nvcc
   ] ++ lib.optionals withPython [
     python3Packages.pybind11
     python3Packages.python
+    python3Packages.torch
   ];
 
   cmakeFlags = [
@@ -90,48 +135,48 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "BUILD_EXAMPLES" withExamples)
     (lib.cmakeBool "BUILD_PYTHON_MODULE" withPython)
     (lib.cmakeBool "BUILD_GUI" withGui)
+    (lib.cmakeBool "ENABLE_HEADLESS_RENDERING" (!withGui))
     (lib.cmakeBool "BUILD_WEBRTC" withGui)
     (lib.cmakeBool "BUILD_JUPYTER_EXTENSION" (withGui && withPython))
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DBUILD_UNIT_TESTS=ON"
-    #"-DBUILD_ISPC_MODULE=OFF" # TODO: it really tries to fetch stuff
-    #"-DENABLE_HEADLESS_RENDERING=ON" it is either that or GUI
-    "-DUSE_SYSTEM_BLAS=ON"
-    "-DUSE_SYSTEM_ASSIMP=ON"
-    "-DUSE_SYSTEM_CURL=ON"
-    "-DUSE_SYSTEM_CUTLASS=ON"
-    "-DUSE_SYSTEM_EIGEN3=ON"
-    "-DUSE_SYSTEM_EMBREE=ON"
-    "-DUSE_SYSTEM_FILAMENT=ON"
-    "-DUSE_SYSTEM_FMT=ON"
-    "-DUSE_SYSTEM_GLEW=ON"
-    "-DUSE_SYSTEM_GLFW=ON"
-    "-DUSE_SYSTEM_GOOGLETEST=ON"
-    "-DUSE_SYSTEM_IMGUI=ON"
-    "-DUSE_SYSTEM_JPEG=ON"
-    "-DUSE_SYSTEM_JSONCPP=ON"
-    "-DUSE_SYSTEM_LIBLZF=ON"
-    "-DUSE_SYSTEM_MSGPACK=ON"
-    "-DUSE_SYSTEM_NANOFLANN=ON"
-    "-DUSE_SYSTEM_OPENSSL=ON"
-    "-DUSE_SYSTEM_PNG=ON"
-    "-DUSE_SYSTEM_PYBIND11=ON"
-    "-DUSE_SYSTEM_QHULLCPP=ON"
-    "-DUSE_SYSTEM_STDGPU=ON"
-    "-DUSE_SYSTEM_TBB=ON"
-    "-DUSE_SYSTEM_TINYGLTF=ON"
-    "-DUSE_SYSTEM_TINYOBJLOADER=ON"
-    "-DUSE_SYSTEM_VTK=ON"
-    "-DUSE_SYSTEM_ZEROMQ=ON"
-    "-DBUILD_LIBREALSENSE=ON"
-    "-DUSE_SYSTEM_LIBREALSENSE=ON"
-    "-DBUILD_TENSORFLOW_OPS=ON"
-    "-DBUILD_PYTORCH_OPS=ON"
-    "-DBUILD_VTK_FROM_SOURCE=OFF"
-    "-DBUILD_FILAMENT_FROM_SOURCE=OFF"
-    "-DPREFER_OSX_HOMEBREW=OFF"
-    # TODO
-    "-DBUILD_ISPC_MODULE=OFF"
+    (lib.cmakeBool "BUILD_SHARED_LIBS" true)
+    (lib.cmakeBool "BUILD_SYCLE_MODULE" true)
+    (lib.cmakeBool "BUILD_UNIT_TESTS" true)
+    (lib.cmakeBool "USE_SYSTEM_BLAS" true)
+    (lib.cmakeBool "USE_SYSTEM_ASSIMP" true)
+    (lib.cmakeBool "USE_SYSTEM_CURL" true)
+    (lib.cmakeBool "USE_SYSTEM_CUTLASS" true)
+    (lib.cmakeBool "USE_SYSTEM_EIGEN3" true)
+    (lib.cmakeBool "USE_SYSTEM_EMBREE" true)
+    (lib.cmakeBool "USE_SYSTEM_FILAMENT" true)
+    (lib.cmakeBool "USE_SYSTEM_FMT" true)
+    (lib.cmakeBool "USE_SYSTEM_GLEW" true)
+    (lib.cmakeBool "USE_SYSTEM_GLFW" true)
+    (lib.cmakeBool "USE_SYSTEM_GOOGLETEST" true)
+    (lib.cmakeBool "USE_SYSTEM_IMGUI" true)
+    (lib.cmakeBool "USE_SYSTEM_JPEG" true)
+    (lib.cmakeBool "USE_SYSTEM_JSONCPP" true)
+    (lib.cmakeBool "USE_SYSTEM_LIBLZF" true)
+    (lib.cmakeBool "USE_SYSTEM_MSGPACK" true)
+    (lib.cmakeBool "USE_SYSTEM_NANOFLANN" true)
+    (lib.cmakeBool "USE_SYSTEM_OPENSSL" true)
+    (lib.cmakeBool "USE_SYSTEM_PNG" true)
+    (lib.cmakeBool "USE_SYSTEM_PYBIND11" withPython)
+    (lib.cmakeBool "USE_SYSTEM_QHULLCPP" true)
+    (lib.cmakeBool "USE_SYSTEM_STDGPU" true)
+    (lib.cmakeBool "USE_SYSTEM_TBB" true)
+    (lib.cmakeBool "USE_SYSTEM_TINYGLTF" true)
+    (lib.cmakeBool "USE_SYSTEM_TINYOBJLOADER" true)
+    (lib.cmakeBool "USE_SYSTEM_VTK" true)
+    (lib.cmakeBool "USE_SYSTEM_ZEROMQ" true)
+    (lib.cmakeBool "BUILD_LIBREALSENSE" true)
+    (lib.cmakeBool "USE_SYSTEM_LIBREALSENSE" true)
+    (lib.cmakeBool "BUILD_TENSORFLOW_OPS" false)  # TODO: Is this a nightmare ?
+    (lib.cmakeBool "BUILD_PYTORCH_OPS" withPython)
+    (lib.cmakeBool "BUILD_VTK_FROM_SOURCE" false)
+    (lib.cmakeBool "BUILD_FILAMENT_FROM_SOURCE" false)
+    (lib.cmakeBool "PREFER_OSX_HOMEBREW" false)
+    (lib.cmakeBool "BUILD_ISPC_MODULE" true)
+    #(lib.cmakeFeature "BORINGSSL_ROOT_DIR" "${boringssl}")
   ];
 
   meta = {
