@@ -1,6 +1,7 @@
 { lib
 , stdenv
 , fetchFromGitHub
+, fetchpatch
 , cmake
 , python3
 , validatePkgConfig
@@ -29,6 +30,14 @@ stdenv.mkDerivation rec {
     chmod -R +w ${src.name}
     export sourceRoot=${src.name}
   '';
+
+  patches = [
+    # Silent CMake version warning
+    (fetchpatch {
+      url = "https://github.com/open-source-parsers/jsoncpp/pull/1499/commits/d40513ada5c9cc8a99527d18977ee9c47940d399.patch";
+      hash = "sha256-WekyeHHmFX1h4j5oKn6KaZch5lklju7K5xHomno8dfc=";
+    })
+  ];
 
   postPatch = lib.optionalString secureMemory ''
     sed -i 's/#define JSONCPP_USING_SECURE_MEMORY 0/#define JSONCPP_USING_SECURE_MEMORY 1/' include/json/version.h
