@@ -1,29 +1,46 @@
 {
+  cmake,
+  fetchFromGitHub,
+  fetchpatch,
   lib,
   stdenv,
-  fetchFromGitHub,
-  cmake,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "tinygltf";
-  version = "2.9.2";
+  version = "2.9.3";
 
   src = fetchFromGitHub {
     owner = "syoyo";
     repo = "tinygltf";
-    rev = "v${version}";
-    hash = "sha256-TOwmxNs+5ANUKyepZ4KXix9JMu7U2fBUVfByu2PvRxU=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-s3RlaDlCkNgbe2sl4TjYKkNLMWqEAGHGWNEV8Z3TH7Y=";
   };
 
+  patches = [
+    # CMake: allow opt-out of installing vendored headers
+    (fetchpatch {
+      url = "https://github.com/syoyo/tinygltf/pull/504/commits/21485496b15f944c93ae9085efc3fcea0f84fdce.patch";
+      hash = "sha256-iFD4Ac4WofG0lGCxuU+iXshvd4QjmzHx3ZlQxzyp+IY=";
+    })
+    # CMake: fix export install dir
+    (fetchpatch {
+      url = "https://github.com/syoyo/tinygltf/pull/503/commits/e2465a83dcbdb9fea85e2f1fd3ca35e06757aeb3.patch";
+      hash = "sha256-ZIiLpltn97Rz+Acjfgr+JPGYa8TQnu/i4hDOU6o5M/8=";
+    })
+  ];
+
   nativeBuildInputs = [ cmake ];
+
+  cmakeFlags = [
+    (lib.cmakeBool "TINYGTLF_INSTALL_VENDOR" false)
+  ];
 
   meta = with lib; {
     description = "Header only C++11 tiny glTF 2.0 library";
     homepage = "https://github.com/syoyo/tinygltf";
     license = licenses.mit;
     maintainers = with maintainers; [ nim65s ];
-    mainProgram = "tinygltf";
-    platforms = platforms.all;
+    platforms = platforms.unix;
   };
-}
+})
