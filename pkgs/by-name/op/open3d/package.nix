@@ -3,6 +3,7 @@
   cmake,
   eigen,
   fetchFromGitHub,
+  fetchpatch,
   filament,
   fmt,
   git,
@@ -17,6 +18,7 @@
   libpng,
   librealsense,
   nanoflann,
+  openssl,
   python3Packages,
   qhull,
   stdenv,
@@ -39,6 +41,22 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-VMykWYfWUzhG+Db1I/9D1GTKd3OzmSXvwzXwaZnu8uI=";
   };
 
+  # Teach CMake how to find our liblzf, tinygltf & filament
+  patches = [
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/9537de0889e07bb94d3ddb6b0313d555595e44c8.patch";
+      hash = "sha256-pDplNXCuEd1yxLNA18sXh5G8GyZWaj6dhjM6pwN8RFI=";
+    })
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/d5f8b1c9.patch";
+      hash = "sha256-bcH02febrpyNRyX9DX3qEzFk9Qf384cw9NAXU7fDSuo=";
+    })
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/940cda4b.patch";
+      hash = "sha256-csbYnVRCVQT5AOn6480iEor42VuJplb1tEJEuL3nV7w=";
+    })
+  ];
+
   nativeBuildInputs = [
     cmake
     git
@@ -58,6 +76,7 @@ stdenv.mkDerivation (finalAttrs: {
     libpng
     librealsense
     nanoflann
+    #openssl
     qhull
     tinygltf
     tinyobjloader
