@@ -7,7 +7,7 @@
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "onedpl";
+  pname = "oneDPL";
   version = "2022.6.0";
 
   src = fetchFromGitHub {
