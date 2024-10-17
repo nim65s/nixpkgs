@@ -32,7 +32,7 @@ stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    install -Dm555 Bin/Linux/PoissonRecon* $out/bin
+    install -Dm555 Bin/Linux/PoissonRecon* -t $out/bin
     install -Dm444 Src/*.h -t $out/include/poisson-recon
     install -Dm444 Src/*.inl -t $out/include/poisson-recon
 
