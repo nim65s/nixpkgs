@@ -13,7 +13,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ cmake ];
 
   # tests require WSL2
-  mesonFlags = [ "-Dbuild-test=false" ];
+  cmakeFlags = [ "-DBUILD_TESTING=OFF" ];
 
   meta = with lib; {
     description = "Official D3D12 headers from Microsoft";
