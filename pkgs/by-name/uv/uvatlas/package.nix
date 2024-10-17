@@ -4,11 +4,19 @@
   directx-math,
   eigen,
   fetchFromGitHub,
+  fetchurl,
   lib,
   spectra,
   stdenv,
 }:
 
+let
+  # ref. https://github.com/microsoft/UVAtlas/blob/25ee5cd86a6d090e8fbc6c51765f52f824f0bb60/build/UVAtlas-GitHub-WSL-11.yml#L122
+  sal_h = fetchurl {
+    url = "https://raw.githubusercontent.com/dotnet/corert/master/src/Native/inc/unix/sal.h";
+    hash = "sha256-u56nwdBc38EKF/6A2Hp80WDBBjx+X6CJzWQFwxxhChs=";
+  };
+in
 stdenv.mkDerivation (finalAttrs: {
   pname = "uv-atlas";
   version = "2024.09";
@@ -19,6 +27,10 @@ stdenv.mkDerivation (finalAttrs: {
     rev = "sep2024";
     hash = "sha256-q44PoSYf2l1PvoHnn+FYQdjTLNW/amAW2rhxJsjgdbQ=";
   };
+
+  postPatch = ''
+    cp ${sal_h} UVAtlas/inc/sal.h
+  '';
 
   nativeBuildInputs = [
     cmake
