@@ -1,14 +1,17 @@
 {
   assimp,
+  blas,
   boost,
-  #boringssl,
+  civetweb,
   cmake,
   cudaPackages,
   curl,
+  directx-headers,
   eigen,
   embree,
   fetchFromGitHub,
   fetchpatch,
+  fetchzip,
   filament,
   fmt,
   git,
@@ -18,6 +21,7 @@
   imgui,
   ispc,
   jsoncpp,
+  lapack,
   lib,
   libGL,
   libjpeg,
@@ -27,15 +31,17 @@
   msgpack,
   msgpack-cxx,
   nanoflann,
+  onedpl,
   opensycl,
   pkg-config,
-  poisson-recon,
+  #poisson-recon,
   python3Packages,
   qhull,
   stdenv,
   tbb,
   tinygltf,
   tinyobjloader,
+  uvatlas,
   vtk,
   withExamples ? true,
   withCuda ? false,
@@ -44,6 +50,22 @@
   zeromq,
   zlib,
 }:
+
+let
+  # their fork does not have the same headers as upstream
+  poisson-recon = fetchFromGitHub {
+    owner = "isl-org";
+    repo = "Open3D-PoissonRecon";
+    rev = "90f3f064e275b275cff445881ecee5a7c495c9e0";
+    hash = "sha256-0cHy3KxvhiJxVrVh/j1FcFMy60o5mQedIapZrOjKhQo=";
+  };
+
+  # I have no idea how to properly package that
+  webrtc = fetchzip {
+    url = "https://github.com/isl-org/open3d_downloads/releases/download/webrtc-v3/webrtc_60e6748_cxx-abi-1.tar.gz";
+    hash = "sha256-1RMHy1qZYt13b6PiuU+wYEmeIesmWENRVmm7y3V0eFU=";
+  };
+in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "open3d";
@@ -83,13 +105,43 @@ stdenv.mkDerivation (finalAttrs: {
 
     # avoid fetch ISPC
     substituteInPlace CMakeLists.txt --replace-fail \
-      'open3d_fetch_ispc_compiler()' \
+        'open3d_fetch_ispc_compiler()' \
       'set(CMAKE_ISPC_COMPILER "${lib.getExe ispc}")'
 
-    # avoid fetch PoissonRecon
+    # fetch PoissonRecon ourself
+    substituteInPlace 3rdparty/possionrecon/possionrecon.cmake --replace-fail \
+      "URL https://github.com/isl-org/Open3D-PoissonRecon/archive/90f3f064e275b275cff445881ecee5a7c495c9e0.tar.gz" \
+      "URL ${poisson-recon}"
 
+    # fetch webrtc ourself
+    substituteInPlace 3rdparty/webrtc/webrtc_download.cmake --replace-fail \
+      "URL \$""{WEBRTC_URL}" \
+      "URL ${webrtc}"
+
+    # avoid fetch civetweb
     substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
-      "
+      "include(\$""{Open3D_3RDPARTY_DIR}/civetweb/civetweb.cmake)
+        open3d_import_3rdparty_library(3rdparty_civetweb
+            INCLUDE_DIRS \$""{CIVETWEB_INCLUDE_DIRS}
+            LIB_DIR      \$""{CIVETWEB_LIB_DIR}
+            LIBRARIES    \$""{CIVETWEB_LIBRARIES}
+            DEPENDS      ext_civetweb
+        )" \
+      "find_package(civetweb CONFIG REQUIRED)
+       open3d_import_3rdparty_library(3rdparty_civetweb DEPENDS civetweb::civetweb-cpp)"
+
+    # avoid fetch onedpl
+    substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
+      "include(\$""{Open3D_3RDPARTY_DIR}/parallelstl/parallelstl.cmake)
+        open3d_import_3rdparty_library(3rdparty_parallelstl
+        PUBLIC
+        INCLUDE_DIRS \$""{PARALLELSTL_INCLUDE_DIRS}
+        INCLUDE_ALL
+        DEPENDS      ext_parallelstl
+        )
+        list(APPEND Open3D_3RDPARTY_PUBLIC_TARGETS_FROM_SYSTEM Open3D::3rdparty_parallelstl)" \
+      "find_package(oneDPL CONFIG REQUIRED)
+       open3d_import_3rdparty_library(3rdparty_parallelstl DEPENDS oneDPL)"
   '';
 
   nativeBuildInputs = [
@@ -99,9 +151,12 @@ stdenv.mkDerivation (finalAttrs: {
   ];
   buildInputs = [
     assimp
+    blas
     boost
-    #boringssl
+    civetweb
     curl
+    directx-headers
+    directx-math:
     eigen
     embree
     filament
@@ -112,6 +167,7 @@ stdenv.mkDerivation (finalAttrs: {
     imgui
     ispc
     jsoncpp
+    lapack
     libGL
     libjpeg
     liblzf
@@ -120,12 +176,14 @@ stdenv.mkDerivation (finalAttrs: {
     msgpack
     msgpack-cxx
     nanoflann
+    onedpl
     opensycl
     poisson-recon
     qhull
     tbb
     tinygltf
     tinyobjloader
+    uvatlas
     vtk
     zeromq
     zlib
@@ -148,6 +206,7 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "BUILD_SHARED_LIBS" true)
     (lib.cmakeBool "BUILD_SYCLE_MODULE" true)
     (lib.cmakeBool "BUILD_UNIT_TESTS" true)
+    (lib.cmakeBool "USE_BLAS" true)
     (lib.cmakeBool "USE_SYSTEM_BLAS" true)
     (lib.cmakeBool "USE_SYSTEM_ASSIMP" true)
     (lib.cmakeBool "USE_SYSTEM_CURL" true)
@@ -183,7 +242,7 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "BUILD_FILAMENT_FROM_SOURCE" false)
     (lib.cmakeBool "PREFER_OSX_HOMEBREW" false)
     (lib.cmakeBool "BUILD_ISPC_MODULE" true)
-    #(lib.cmakeFeature "BORINGSSL_ROOT_DIR" "${boringssl}")
+    (lib.cmakeBool "WITH_IPPICV" false)
   ];
 
   meta = {
