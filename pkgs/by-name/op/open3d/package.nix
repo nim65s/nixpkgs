@@ -7,13 +7,14 @@
   cudaPackages,
   curl,
   directx-headers,
+  directx-math,
   eigen,
   embree,
   fetchFromGitHub,
   fetchpatch,
   fetchzip,
   filament,
-  fmt,
+  fmt_9,
   git,
   glew,
   glfw,
@@ -28,16 +29,18 @@
   liblzf,
   libpng,
   librealsense,
+  minizip,
   msgpack,
   msgpack-cxx,
   nanoflann,
-  onedpl,
+  oneDPL,
   opensycl,
   pkg-config,
   #poisson-recon,
   python3Packages,
   qhull,
   stdenv,
+  spectra,
   tbb,
   tinygltf,
   tinyobjloader,
@@ -78,8 +81,8 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-VMykWYfWUzhG+Db1I/9D1GTKd3OzmSXvwzXwaZnu8uI=";
   };
 
-  # Teach CMake how to find our liblzf, tinygltf & filament
   patches = [
+    # Teach CMake how to find our liblzf, tinygltf & filament
     (fetchpatch {
       url = "https://github.com/nim65s/Open3D/commit/9537de0889e07bb94d3ddb6b0313d555595e44c8.patch";
       hash = "sha256-pDplNXCuEd1yxLNA18sXh5G8GyZWaj6dhjM6pwN8RFI=";
@@ -92,11 +95,20 @@ stdenv.mkDerivation (finalAttrs: {
       url = "https://github.com/nim65s/Open3D/commit/940cda4b.patch";
       hash = "sha256-csbYnVRCVQT5AOn6480iEor42VuJplb1tEJEuL3nV7w=";
     })
+
+    # Allow use of embree 4
+    (fetchpatch {
+      url = "https://github.com/isl-org/Open3D/pull/6665/commits/43e7ceb8e676dfe812c52362d18d716041cc239d.patch";
+      hash = "sha256-93j6QYo4c0CKY4KnVP5OEvTw+/jVNf7FKTfSsrGldDE=";
+    })
+    (fetchpatch {
+      url = "https://github.com/isl-org/Open3D/pull/6665/commits/94e64ae7f11a6ecb1aa8d1c06eb57ad26c18e3d6.patch";
+      hash = "sha256-ud9RnGrNud+DrPTB8eCHRu3KeAAxOlHrQhw9YAs81wE=";
+    })
   ];
 
   postPatch = ''
-    # avoid fetch FetchContent on
-    # https://github.com/isl-org/open3d_downloads/releases/download/mesa-libgl/mesa_libGL_22.1.4.tar.bz2
+    # avoid fetch mesa
     substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
       "if(BUILD_GUI AND UNIX AND NOT APPLE)" \
       "if(BUILD_GUI AND UNIX AND NOT APPLE)
@@ -130,7 +142,7 @@ stdenv.mkDerivation (finalAttrs: {
       "find_package(civetweb CONFIG REQUIRED)
        open3d_import_3rdparty_library(3rdparty_civetweb DEPENDS civetweb::civetweb-cpp)"
 
-    # avoid fetch onedpl
+    # avoid fetch oneDPL
     substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
       "include(\$""{Open3D_3RDPARTY_DIR}/parallelstl/parallelstl.cmake)
         open3d_import_3rdparty_library(3rdparty_parallelstl
@@ -141,7 +153,31 @@ stdenv.mkDerivation (finalAttrs: {
         )
         list(APPEND Open3D_3RDPARTY_PUBLIC_TARGETS_FROM_SYSTEM Open3D::3rdparty_parallelstl)" \
       "find_package(oneDPL CONFIG REQUIRED)
-       open3d_import_3rdparty_library(3rdparty_parallelstl DEPENDS oneDPL)"
+       open3d_import_3rdparty_library(3rdparty_parallelstl INCLUDE_DIRS ${oneDPL}/include/oneapi/dpl DEPENDS oneDPL)"
+
+    # avoid fetch uvatlas
+    substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
+      "include(\$""{Open3D_3RDPARTY_DIR}/uvatlas/uvatlas.cmake)
+    open3d_import_3rdparty_library(3rdparty_uvatlas
+        HIDDEN
+        INCLUDE_DIRS \$""{UVATLAS_INCLUDE_DIRS}
+        LIB_DIR      \$""{UVATLAS_LIB_DIR}
+        LIBRARIES    \$""{UVATLAS_LIBRARIES}
+        DEPENDS      ext_uvatlas
+    )" \
+      "find_package(UVAtlas CONFIG REQUIRED)
+       open3d_import_3rdparty_library(3rdparty_uvatlas DEPENDS Microsoft::UVAtlas)"
+
+    # Fix hardcoded matc bin path from filament
+    substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
+      "/usr/bin/matc" \
+      "${lib.getExe' filament "matc"}"
+
+    # utility wants unzip.h
+    substituteInPlace cpp/open3d/utility/CMakeLists.txt --replace-fail \
+      "endif()" \
+      "endif()
+       target_include_directories(utility PRIVATE ${minizip}/include/minizip)"
   '';
 
   nativeBuildInputs = [
@@ -156,11 +192,11 @@ stdenv.mkDerivation (finalAttrs: {
     civetweb
     curl
     directx-headers
-    directx-math:
+    directx-math
     eigen
     embree
     filament
-    fmt
+    fmt_9
     glew
     glfw
     gtest
@@ -173,13 +209,15 @@ stdenv.mkDerivation (finalAttrs: {
     liblzf
     libpng
     librealsense
+    minizip
     msgpack
     msgpack-cxx
     nanoflann
-    onedpl
+    oneDPL
     opensycl
     poisson-recon
     qhull
+    spectra
     tbb
     tinygltf
     tinyobjloader
