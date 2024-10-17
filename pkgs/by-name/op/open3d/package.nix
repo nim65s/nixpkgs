@@ -29,6 +29,7 @@
   nanoflann,
   opensycl,
   pkg-config,
+  poisson-recon,
   python3Packages,
   qhull,
   stdenv,
@@ -84,6 +85,11 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace CMakeLists.txt --replace-fail \
       'open3d_fetch_ispc_compiler()' \
       'set(CMAKE_ISPC_COMPILER "${lib.getExe ispc}")'
+
+    # avoid fetch PoissonRecon
+
+    substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
+      "
   '';
 
   nativeBuildInputs = [
@@ -115,6 +121,7 @@ stdenv.mkDerivation (finalAttrs: {
     msgpack-cxx
     nanoflann
     opensycl
+    poisson-recon
     qhull
     tbb
     tinygltf
