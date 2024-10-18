@@ -4,6 +4,7 @@
   boost,
   civetweb,
   cmake,
+  cppzmq,
   cudaPackages,
   curl,
   directx-headers,
@@ -39,6 +40,7 @@
   #poisson-recon,
   python3Packages,
   qhull,
+  salh,
   stdenv,
   spectra,
   tbb,
@@ -50,6 +52,7 @@
   withCuda ? false,
   withPython ? true,
   withGui ? true,
+  xorg,
   zeromq,
   zlib,
 }:
@@ -95,8 +98,12 @@ stdenv.mkDerivation (finalAttrs: {
       url = "https://github.com/nim65s/Open3D/commit/940cda4b.patch";
       hash = "sha256-csbYnVRCVQT5AOn6480iEor42VuJplb1tEJEuL3nV7w=";
     })
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/d6231ab0.patch";
+      hash = "sha256-TDLa3+7isgGz8p5nTMLfJ6Nf44vke5bHygk82ON2XxI=";
+    })
 
-    # Allow use of embree 4
+    # Allow use of embree >= 4
     (fetchpatch {
       url = "https://github.com/isl-org/Open3D/pull/6665/commits/43e7ceb8e676dfe812c52362d18d716041cc239d.patch";
       hash = "sha256-93j6QYo4c0CKY4KnVP5OEvTw+/jVNf7FKTfSsrGldDE=";
@@ -105,6 +112,47 @@ stdenv.mkDerivation (finalAttrs: {
       url = "https://github.com/isl-org/Open3D/pull/6665/commits/94e64ae7f11a6ecb1aa8d1c06eb57ad26c18e3d6.patch";
       hash = "sha256-ud9RnGrNud+DrPTB8eCHRu3KeAAxOlHrQhw9YAs81wE=";
     })
+
+    # Allow use of imgui >= 1.89.6
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/6c052b846dce28a0015246c63efea5f706b3286b.patch";
+      hash = "sha256-a5wd9ALeqwpfUrgBwI1u/HnWTK3MnPXat2If3v2+dM8=";
+    })
+
+    # Allow use of filament >= 1.25.6 (Camera: float -> double)
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/145b934b0c2165189f7ea68dd15f59b574afebcd.patch";
+      hash = "sha256-g5N+/mnNwOFoy837XBB9peiEIRE/5293CPGujOirenU=";
+    })
+
+    # Allow use of filament >= 1.12.1 (Camera: float -> double)
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/85f022ca.patch";
+      hash = "sha256-gvVSM+bW9JESxhKIaiFDTTpkl+Tf9wENVn8496nFUic=";
+    })
+
+    # Allow use of filament >= 1.12.1 (Ktx -> Ktx1)
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/8be0e960.patch";
+      hash = "sha256-ah8gtLOWCSIuvBgE5cJWxKURTZc3Y7frsHmDwMVujDY=";
+    })
+
+    # Allow use of filament >= 1.9.24 (uchimura / reinhard removed)
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/ee088905.patch";
+      hash = "sha256-DhN4pTTSB1ZAKSsmhSLi4txmJLaRCjqwxuMptLbqTCI=";
+    })
+
+    # Allow use of filament >= 1.23.1 (setGeometryAt
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/59759786.patch";
+      hash = "sha256-NVlsDXf+U5zfja5gWMxSaX6QN20BEuhhyvXHeK0Nx90=";
+    })
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/64701620.patch";
+      hash = "sha256-qWEmq67npveDFBAK/GYa6853w7v/Q3IxAZnYNyvXpaI=";
+    })
+
   ];
 
   postPatch = ''
@@ -117,7 +165,7 @@ stdenv.mkDerivation (finalAttrs: {
 
     # avoid fetch ISPC
     substituteInPlace CMakeLists.txt --replace-fail \
-        'open3d_fetch_ispc_compiler()' \
+      'open3d_fetch_ispc_compiler()' \
       'set(CMAKE_ISPC_COMPILER "${lib.getExe ispc}")'
 
     # fetch PoissonRecon ourself
@@ -139,8 +187,9 @@ stdenv.mkDerivation (finalAttrs: {
             LIBRARIES    \$""{CIVETWEB_LIBRARIES}
             DEPENDS      ext_civetweb
         )" \
-      "find_package(civetweb CONFIG REQUIRED)
-       open3d_import_3rdparty_library(3rdparty_civetweb DEPENDS civetweb::civetweb-cpp)"
+      "open3d_find_package_3rdparty_library(3rdparty_civetweb
+         PACKAGE civetweb
+         TARGETS civetweb::civetweb-cpp)"
 
     # avoid fetch oneDPL
     substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
@@ -152,8 +201,10 @@ stdenv.mkDerivation (finalAttrs: {
         DEPENDS      ext_parallelstl
         )
         list(APPEND Open3D_3RDPARTY_PUBLIC_TARGETS_FROM_SYSTEM Open3D::3rdparty_parallelstl)" \
-      "find_package(oneDPL CONFIG REQUIRED)
-       open3d_import_3rdparty_library(3rdparty_parallelstl INCLUDE_DIRS ${oneDPL}/include/oneapi/dpl DEPENDS oneDPL)"
+      "open3d_find_package_3rdparty_library(3rdparty_parallelstl
+         PACKAGE oneDPL
+         INCLUDE_DIRS ${oneDPL}/include/oneapi/dpl
+         TARGETS oneDPL)"
 
     # avoid fetch uvatlas
     substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
@@ -165,8 +216,9 @@ stdenv.mkDerivation (finalAttrs: {
         LIBRARIES    \$""{UVATLAS_LIBRARIES}
         DEPENDS      ext_uvatlas
     )" \
-      "find_package(UVAtlas CONFIG REQUIRED)
-       open3d_import_3rdparty_library(3rdparty_uvatlas DEPENDS Microsoft::UVAtlas)"
+      "open3d_find_package_3rdparty_library(3rdparty_uvatlas
+         PACKAGE UVAtlas
+         TARGETS Microsoft::UVAtlas)"
 
     # Fix hardcoded matc bin path from filament
     substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
@@ -174,10 +226,60 @@ stdenv.mkDerivation (finalAttrs: {
       "${lib.getExe' filament "matc"}"
 
     # utility wants unzip.h
-    substituteInPlace cpp/open3d/utility/CMakeLists.txt --replace-fail \
-      "endif()" \
-      "endif()
-       target_include_directories(utility PRIVATE ${minizip}/include/minizip)"
+    echo "target_include_directories(utility PRIVATE
+      ${minizip}/include/minizip
+      )" >> cpp/open3d/utility/CMakeLists.txt
+
+    # tgeometry_kernel wants unknwn.h & DirectXMath.h
+    #echo "target_include_directories(tgeometry_kernel PRIVATE
+      #${directx-headers}/include/wsl/stubs
+      #${directx-math}/include/directxmath
+      #)" >> cpp/open3d/t/geometry/kernel/CMakeLists.txt
+
+    # partial replace onedpl with tbb, because "fatal error: pstl/execution: No such file or directory"
+    # ref. https://github.com/isl-org/Open3D/pull/6809
+    substituteInPlace cpp/open3d/utility/ParallelScan.h --replace-fail \
+      "TBB_INTERFACE_VERSION >= 10000" \
+      "false"
+
+    # fix lzf includes
+    substituteInPlace cpp/open3d/io/file_format/FilePCD.cpp --replace-fail \
+      "liblzf/lzf.h" \
+      "lzf.h"
+    substituteInPlace cpp/open3d/t/io/file_format/FilePCD.cpp --replace-fail \
+      "liblzf/lzf.h" \
+      "lzf.h"
+
+    # C++17 is required by filament and its "is_same_v"
+    substituteInPlace CMakeLists.txt --replace-fail \
+      "CMAKE_CXX_STANDARD 14" \
+      "CMAKE_CXX_STANDARD 17" \
+
+    # don't abort compilation for an unused or deprecated stuff
+    echo 'set_target_properties(visualization PROPERTIES
+      COMPILE_FLAGS "-Wno-unused-function -Wno-deprecated-declarations"
+      )' >> cpp/open3d/visualization/CMakeLists.txt
+
+    # Fix -Wpessimizing-move-Werror
+    substituteInPlace cpp/open3d/visualization/rendering/RendererHandle.h --replace-fail \
+      "return std::move(REHandle(id));" \
+      "return REHandle(id);"
+    substituteInPlace cpp/open3d/visualization/rendering/filament/FilamentResourceManager.cpp --replace-fail \
+      "return std::move(std::shared_ptr<ResourceType>(
+                pointer, [&engine](ResourceType* p) { engine.destroy(p); }));" \
+      "return std::shared_ptr<ResourceType>(
+                pointer, [&engine](ResourceType* p) { engine.destroy(p); });"
+
+
+    # wtf
+    substituteInPlace cpp/open3d/visualization/rendering/filament/FilamentResourceManager.cpp \
+      --replace-fail \
+        "RenderTarget::COLOR" \
+        "RenderTarget::AttachmentPoint::COLOR" \
+      --replace-fail \
+        "RenderTarget::DEPTH" \
+        "RenderTarget::AttachmentPoint::DEPTH"
+
   '';
 
   nativeBuildInputs = [
@@ -190,6 +292,7 @@ stdenv.mkDerivation (finalAttrs: {
     blas
     boost
     civetweb
+    cppzmq
     curl
     directx-headers
     directx-math
@@ -217,12 +320,14 @@ stdenv.mkDerivation (finalAttrs: {
     opensycl
     poisson-recon
     qhull
+    salh
     spectra
     tbb
     tinygltf
     tinyobjloader
     uvatlas
     vtk
+    xorg.libXrandr
     zeromq
     zlib
   ] ++ lib.optionals withCuda [
