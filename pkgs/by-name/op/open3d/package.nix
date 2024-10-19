@@ -102,6 +102,10 @@ stdenv.mkDerivation (finalAttrs: {
       url = "https://github.com/nim65s/Open3D/commit/d6231ab0.patch";
       hash = "sha256-TDLa3+7isgGz8p5nTMLfJ6Nf44vke5bHygk82ON2XxI=";
     })
+    (fetchpatch {
+      url = "https://github.com/nim65s/Open3D/commit/470201de.patch";
+      hash = "sha256-8dPE9xSZLRMxJN27i0C/Gozb2TKuBr1zW4VrVbEvUFw=";
+    })
 
     # Allow use of embree >= 4
     (fetchpatch {
@@ -151,6 +155,12 @@ stdenv.mkDerivation (finalAttrs: {
     (fetchpatch {
       url = "https://github.com/nim65s/Open3D/commit/64701620.patch";
       hash = "sha256-qWEmq67npveDFBAK/GYa6853w7v/Q3IxAZnYNyvXpaI=";
+    })
+
+    # Add missing includes
+    (fetchpatch {
+      url = "https://github.com/isl-org/Open3D/pull/6847/commits/dcea5f9ce122317f2289e1b682d9d5567564275d.patch";
+      hash = "sha256-8imKdU8miIMPfFVCsDU3QsV2r/+GVQG1d8ewGb20lS4";
     })
 
   ];
