@@ -30,6 +30,7 @@
   liblzf,
   libpng,
   librealsense,
+  llvmPackages,
   minizip,
   msgpack,
   msgpack-cxx,
@@ -41,7 +42,7 @@
   python3Packages,
   qhull,
   salh,
-  stdenv,
+  clangStdenv,
   spectra,
   tbb,
   tinygltf,
@@ -59,7 +60,7 @@
 
 let
   # their fork does not have the same headers as upstream
-  poisson-recon = fetchFromGitHub {
+  poisson-recon-fork = fetchFromGitHub {
     owner = "isl-org";
     repo = "Open3D-PoissonRecon";
     rev = "90f3f064e275b275cff445881ecee5a7c495c9e0";
@@ -67,13 +68,19 @@ let
   };
 
   # I have no idea how to properly package that
-  webrtc = fetchzip {
+  webrtc-fork = fetchzip {
     url = "https://github.com/isl-org/open3d_downloads/releases/download/webrtc-v3/webrtc_60e6748_cxx-abi-1.tar.gz";
     hash = "sha256-1RMHy1qZYt13b6PiuU+wYEmeIesmWENRVmm7y3V0eFU=";
   };
+
+  # TODO: dig why they need a fork
+  filament-fork = fetchzip {
+    url = "https://github.com/isl-org/filament/archive/d1d873d27f43ba0cee1674a555cc0f18daac3008.tar.gz";
+    hash = "sha256-RN+51ODInmjrfHYbLATjF2iB2HGFxfzlH+VCSAyB2TU";
+  };
 in
 
-stdenv.mkDerivation (finalAttrs: {
+clangStdenv.mkDerivation (finalAttrs: {
   pname = "open3d";
   version = "0.18.0";
 
@@ -94,18 +101,18 @@ stdenv.mkDerivation (finalAttrs: {
       url = "https://github.com/nim65s/Open3D/commit/d5f8b1c9.patch";
       hash = "sha256-bcH02febrpyNRyX9DX3qEzFk9Qf384cw9NAXU7fDSuo=";
     })
-    (fetchpatch {
-      url = "https://github.com/nim65s/Open3D/commit/940cda4b.patch";
-      hash = "sha256-csbYnVRCVQT5AOn6480iEor42VuJplb1tEJEuL3nV7w=";
-    })
-    (fetchpatch {
-      url = "https://github.com/nim65s/Open3D/commit/d6231ab0.patch";
-      hash = "sha256-TDLa3+7isgGz8p5nTMLfJ6Nf44vke5bHygk82ON2XxI=";
-    })
-    (fetchpatch {
-      url = "https://github.com/nim65s/Open3D/commit/470201de.patch";
-      hash = "sha256-8dPE9xSZLRMxJN27i0C/Gozb2TKuBr1zW4VrVbEvUFw=";
-    })
+    #(fetchpatch {
+      #url = "https://github.com/nim65s/Open3D/commit/940cda4b.patch";
+      #hash = "sha256-csbYnVRCVQT5AOn6480iEor42VuJplb1tEJEuL3nV7w=";
+    #})
+    #(fetchpatch {
+      #url = "https://github.com/nim65s/Open3D/commit/d6231ab0.patch";
+      #hash = "sha256-TDLa3+7isgGz8p5nTMLfJ6Nf44vke5bHygk82ON2XxI=";
+    #})
+    #(fetchpatch {
+      #url = "https://github.com/nim65s/Open3D/commit/470201de.patch";
+      #hash = "sha256-8dPE9xSZLRMxJN27i0C/Gozb2TKuBr1zW4VrVbEvUFw=";
+    #})
 
     # Allow use of embree >= 4
     (fetchpatch {
@@ -124,38 +131,38 @@ stdenv.mkDerivation (finalAttrs: {
     })
 
     # Allow use of filament >= 1.25.6 (Camera: float -> double)
-    (fetchpatch {
-      url = "https://github.com/nim65s/Open3D/commit/145b934b0c2165189f7ea68dd15f59b574afebcd.patch";
-      hash = "sha256-g5N+/mnNwOFoy837XBB9peiEIRE/5293CPGujOirenU=";
-    })
+    #(fetchpatch {
+      #url = "https://github.com/nim65s/Open3D/commit/145b934b0c2165189f7ea68dd15f59b574afebcd.patch";
+      #hash = "sha256-g5N+/mnNwOFoy837XBB9peiEIRE/5293CPGujOirenU=";
+    #})
 
-    # Allow use of filament >= 1.12.1 (Camera: float -> double)
-    (fetchpatch {
-      url = "https://github.com/nim65s/Open3D/commit/85f022ca.patch";
-      hash = "sha256-gvVSM+bW9JESxhKIaiFDTTpkl+Tf9wENVn8496nFUic=";
-    })
+    ## Allow use of filament >= 1.12.1 (Camera: float -> double)
+    #(fetchpatch {
+      #url = "https://github.com/nim65s/Open3D/commit/85f022ca.patch";
+      #hash = "sha256-gvVSM+bW9JESxhKIaiFDTTpkl+Tf9wENVn8496nFUic=";
+    #})
 
-    # Allow use of filament >= 1.12.1 (Ktx -> Ktx1)
-    (fetchpatch {
-      url = "https://github.com/nim65s/Open3D/commit/8be0e960.patch";
-      hash = "sha256-ah8gtLOWCSIuvBgE5cJWxKURTZc3Y7frsHmDwMVujDY=";
-    })
+    ## Allow use of filament >= 1.12.1 (Ktx -> Ktx1)
+    #(fetchpatch {
+      #url = "https://github.com/nim65s/Open3D/commit/8be0e960.patch";
+      #hash = "sha256-ah8gtLOWCSIuvBgE5cJWxKURTZc3Y7frsHmDwMVujDY=";
+    #})
 
-    # Allow use of filament >= 1.9.24 (uchimura / reinhard removed)
-    (fetchpatch {
-      url = "https://github.com/nim65s/Open3D/commit/ee088905.patch";
-      hash = "sha256-DhN4pTTSB1ZAKSsmhSLi4txmJLaRCjqwxuMptLbqTCI=";
-    })
+    ## Allow use of filament >= 1.9.24 (uchimura / reinhard removed)
+    #(fetchpatch {
+      #url = "https://github.com/nim65s/Open3D/commit/ee088905.patch";
+      #hash = "sha256-DhN4pTTSB1ZAKSsmhSLi4txmJLaRCjqwxuMptLbqTCI=";
+    #})
 
-    # Allow use of filament >= 1.23.1 (setGeometryAt
-    (fetchpatch {
-      url = "https://github.com/nim65s/Open3D/commit/59759786.patch";
-      hash = "sha256-NVlsDXf+U5zfja5gWMxSaX6QN20BEuhhyvXHeK0Nx90=";
-    })
-    (fetchpatch {
-      url = "https://github.com/nim65s/Open3D/commit/64701620.patch";
-      hash = "sha256-qWEmq67npveDFBAK/GYa6853w7v/Q3IxAZnYNyvXpaI=";
-    })
+    ## Allow use of filament >= 1.23.1 (setGeometryAt
+    #(fetchpatch {
+      #url = "https://github.com/nim65s/Open3D/commit/59759786.patch";
+      #hash = "sha256-NVlsDXf+U5zfja5gWMxSaX6QN20BEuhhyvXHeK0Nx90=";
+    #})
+    #(fetchpatch {
+      #url = "https://github.com/nim65s/Open3D/commit/64701620.patch";
+      #hash = "sha256-qWEmq67npveDFBAK/GYa6853w7v/Q3IxAZnYNyvXpaI=";
+    #})
 
     # Add missing includes
     (fetchpatch {
@@ -181,12 +188,16 @@ stdenv.mkDerivation (finalAttrs: {
     # fetch PoissonRecon ourself
     substituteInPlace 3rdparty/possionrecon/possionrecon.cmake --replace-fail \
       "URL https://github.com/isl-org/Open3D-PoissonRecon/archive/90f3f064e275b275cff445881ecee5a7c495c9e0.tar.gz" \
-      "URL ${poisson-recon}"
+      "URL ${poisson-recon-fork}"
 
     # fetch webrtc ourself
     substituteInPlace 3rdparty/webrtc/webrtc_download.cmake --replace-fail \
       "URL \$""{WEBRTC_URL}" \
-      "URL ${webrtc}"
+      "URL ${webrtc-fork}"
+
+    substituteInPlace 3rdparty/filament/filament_build.cmake --replace-fail \
+      "URL https://github.com/isl-org/filament/archive/d1d873d27f43ba0cee1674a555cc0f18daac3008.tar.gz" \
+      "URL ${filament-fork}"
 
     # avoid fetch civetweb
     substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
@@ -282,14 +293,18 @@ stdenv.mkDerivation (finalAttrs: {
 
 
     # wtf
-    substituteInPlace cpp/open3d/visualization/rendering/filament/FilamentResourceManager.cpp \
-      --replace-fail \
-        "RenderTarget::COLOR" \
-        "RenderTarget::AttachmentPoint::COLOR" \
-      --replace-fail \
-        "RenderTarget::DEPTH" \
-        "RenderTarget::AttachmentPoint::DEPTH"
+    #substituteInPlace cpp/open3d/visualization/rendering/filament/FilamentResourceManager.cpp \
+      #--replace-fail \
+        #"RenderTarget::COLOR" \
+        #"RenderTarget::AttachmentPoint::COLOR" \
+      #--replace-fail \
+        #"RenderTarget::DEPTH" \
+        #"RenderTarget::AttachmentPoint::DEPTH"
 
+    # don't hardcode clang things
+    substituteInPlace 3rdparty/find_dependencies.cmake --replace-fail \
+      "set(CLANG_LIBDIR \"/usr/lib/llvm-\$""{CMAKE_MATCH_1}/lib\")" \
+      "set(CLANG_LIBDIR \"${lib.getLib llvmPackages.libcxx}/lib\")"
   '';
 
   nativeBuildInputs = [
@@ -322,13 +337,15 @@ stdenv.mkDerivation (finalAttrs: {
     liblzf
     libpng
     librealsense
+    llvmPackages.libcxx
+    llvmPackages.openmp
     minizip
     msgpack
     msgpack-cxx
     nanoflann
     oneDPL
     opensycl
-    poisson-recon
+    #poisson-recon
     qhull
     salh
     spectra
@@ -366,7 +383,7 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "USE_SYSTEM_CUTLASS" true)
     (lib.cmakeBool "USE_SYSTEM_EIGEN3" true)
     (lib.cmakeBool "USE_SYSTEM_EMBREE" true)
-    (lib.cmakeBool "USE_SYSTEM_FILAMENT" true)
+    (lib.cmakeBool "USE_SYSTEM_FILAMENT" false)  # too hard for now
     (lib.cmakeBool "USE_SYSTEM_FMT" true)
     (lib.cmakeBool "USE_SYSTEM_GLEW" true)
     (lib.cmakeBool "USE_SYSTEM_GLFW" true)
@@ -389,10 +406,10 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "USE_SYSTEM_ZEROMQ" true)
     (lib.cmakeBool "BUILD_LIBREALSENSE" true)
     (lib.cmakeBool "USE_SYSTEM_LIBREALSENSE" true)
-    (lib.cmakeBool "BUILD_TENSORFLOW_OPS" false)  # TODO: Is this a nightmare ?
+    (lib.cmakeBool "BUILD_TENSORFLOW_OPS" false)
     (lib.cmakeBool "BUILD_PYTORCH_OPS" withPython)
     (lib.cmakeBool "BUILD_VTK_FROM_SOURCE" false)
-    (lib.cmakeBool "BUILD_FILAMENT_FROM_SOURCE" false)
+    (lib.cmakeBool "BUILD_FILAMENT_FROM_SOURCE" true)  # TODO
     (lib.cmakeBool "PREFER_OSX_HOMEBREW" false)
     (lib.cmakeBool "BUILD_ISPC_MODULE" true)
     (lib.cmakeBool "WITH_IPPICV" false)
