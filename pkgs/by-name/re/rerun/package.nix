@@ -1,7 +1,6 @@
 {
   lib,
   rustPlatform,
-  fetchpatch,
   fetchFromGitHub,
   pkg-config,
   stdenv,
@@ -22,19 +21,15 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "rerun";
-  version = "0.18.2";
+  version = "0.20.1";
   src = fetchFromGitHub {
     owner = "rerun-io";
     repo = "rerun";
     rev = version;
-    sha256 = "sha256-mQjjgRKNFSts34Lphfje9H1BLY9nybCrJ2V09nMzVDM=";
+    hash = "sha256-gDET+WtFzhPHpgRJeylfQ2W7qh8k7rf9U30jwEWmPJc=";
   };
 
-  cargoHash = "sha256-ZyjRe4M6RabSKhKCLa1ed1fsF6dkUt2a1c8C/1E48+M=";
-  # the crate uses an old rust version (currently 1.76)
-  # nixpkgs only works with the latest rust (currently 1.80)
-  # so we patch this
-  cargoPatches = [ ./rust-version.patch ];
+  cargoHash = "sha256-CIPjJSoHUAF8tCU4NNclsIViu9hWwmsVYpjvySRqqfc=";
 
   cargoBuildFlags = [ "--package rerun-cli" ];
   cargoTestFlags = [ "--package rerun-cli" ];
