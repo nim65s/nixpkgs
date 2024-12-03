@@ -19,6 +19,7 @@
   torch,
   torchvision,
   tqdm,
+  visdom,
   wget,
 }:
 
@@ -58,7 +59,7 @@ buildPythonPackage rec {
       scikit-learn
       seaborn
       scipy
-      # visdom
+      visdom
       wget
     ];
   };
