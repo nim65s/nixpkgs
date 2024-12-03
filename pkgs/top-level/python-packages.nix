@@ -9851,6 +9851,10 @@ self: super: with self; {
 
   panasonic-viera = callPackage ../development/python-modules/panasonic-viera { };
 
+  panda3d = callPackage ../development/python-modules/panda3d {
+    inherit (pkgs) mesa;
+  };
+
   pandantic = callPackage ../development/python-modules/pandantic { };
 
   pandas = callPackage ../development/python-modules/pandas {
