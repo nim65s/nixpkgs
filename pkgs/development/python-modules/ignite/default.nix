@@ -12,6 +12,7 @@
   mock,
   packaging,
   torch,
+  visdom,
 }:
 
 buildPythonPackage rec {
@@ -41,6 +42,7 @@ buildPythonPackage rec {
     mock
     pytest-xdist
     torchvision
+    visdom
   ];
 
   # runs successfully in 3.9, however, async isn't correctly closed so it will fail after test suite.
@@ -76,7 +78,6 @@ buildPythonPackage rec {
     "test_setup_plx"
     "test_write_results"
     "trains"
-    "visdom"
   ];
 
   pythonImportsCheck = [
