@@ -7,14 +7,14 @@
 , graphviz
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "eigen";
   version = "3.4.0";
 
   src = fetchFromGitLab {
     owner = "libeigen";
-    repo = pname;
-    rev = version;
+    repo = finalAttrs.pname;
+    rev = finalAttrs.version;
     hash = "sha256-1/4xMetKMDOgZgzz3WMxfHUEpmdAm52RqZvz6i0mLEw=";
   };
 
@@ -53,11 +53,11 @@ stdenv.mkDerivation rec {
     cp -r doc/* $out/share/doc/eigen
   '';
 
-  meta = with lib; {
+  meta = {
     homepage = "https://eigen.tuxfamily.org";
     description = "C++ template library for linear algebra: vectors, matrices, and related algorithms";
-    license = licenses.lgpl3Plus;
-    maintainers = with maintainers; [ sander raskin ];
-    platforms = platforms.unix;
+    license = lib.licenses.lgpl3Plus;
+    maintainers = with lib.maintainers; [ sander raskin ];
+    platforms = lib.platforms.unix;
   };
-}
+})
