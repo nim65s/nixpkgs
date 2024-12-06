@@ -3,6 +3,8 @@
 , fetchFromGitLab
 , fetchpatch
 , cmake
+, doxygen
+, graphviz
 }:
 
 stdenv.mkDerivation rec {
@@ -34,7 +36,22 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  nativeBuildInputs = [ cmake ];
+  outputs = [ "out" "doc" ];
+
+  nativeBuildInputs = [
+    cmake
+    doxygen
+    graphviz
+  ];
+
+  postBuild = ''
+    make doc
+  '';
+
+  postInstall = ''
+    mkdir -p $out/share/doc/eigen
+    cp -r doc/* $out/share/doc/eigen
+  '';
 
   meta = with lib; {
     homepage = "https://eigen.tuxfamily.org";
