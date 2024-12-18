@@ -5963,6 +5963,8 @@ self: super: with self; {
 
   hpp-practicals = toPythonModule (pkgs.hpp-practicals.override { python3Packages = self; });
 
+  hpp-python = toPythonModule (pkgs.callPackage ../development/python-modules/hpp-python { python3Packages = self; });
+
   hpp-romeo = toPythonModule (pkgs.hpp-romeo.override {
     pythonSupport = true;
     python3Packages = self;
