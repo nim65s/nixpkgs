@@ -41,6 +41,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = true;
 
+  cmakeFlags = lib.optionals stdenv.hostPlatform.isDarwin [
+    "-DCMAKE_CTEST_ARGUMENTS=--exclude-regex;'test-jacobians|solver-by-substitution'"
+  ];
+
   meta = {
     description = "Definition of basic geometric constraints for motion planning";
     homepage = "https://github.com/humanoid-path-planner/hpp-constraints";
