@@ -22,7 +22,7 @@ let
     src = fetchFromGitHub {
       owner = "humanoid-path-planner";
       repo = "hpp-corbaserver";
-      tag = "v${finalAttrs.version}";
+      rev = "v${finalAttrs.version}";
       hash = "sha256-1snnRFRgg+5LWtDBBmtqPE3YBqjDIct+2mfEIKd6ow8=";
     };
 

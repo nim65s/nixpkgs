@@ -17,7 +17,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "humanoid-path-planner";
     repo = "hpp-util";
-    tag = "v${finalAttrs.version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-Op7bCaDOoKppEzj0wWNs52QhtdPTvMp+qEwW4ZA446M=";
   };
 

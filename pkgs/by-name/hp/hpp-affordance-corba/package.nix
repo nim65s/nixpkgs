@@ -17,7 +17,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "humanoid-path-planner";
     repo = "hpp-affordance-corba";
-    tag = "v${finalAttrs.version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-5NR9EenpqGUNHG2ZeizUafxq4znXWZFPPMgHo3cjVfI=";
   };
 

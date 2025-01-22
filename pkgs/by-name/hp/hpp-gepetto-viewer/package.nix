@@ -16,7 +16,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "humanoid-path-planner";
     repo = "hpp-gepetto-viewer";
-    tag = "v${finalAttrs.version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-tWPyeEc8mpC5nE+z4Wb7BRTEXfQxhzshl8nBx8AXHAo=";
   };
 

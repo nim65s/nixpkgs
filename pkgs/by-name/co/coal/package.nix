@@ -22,7 +22,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "coal-library";
     repo = "coal";
-    tag = "v${finalAttrs.version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-7LfeBQX9k0HY/muIl3FNq3xQv66KnwV9BChi0LxFcAQ=";
   };
 

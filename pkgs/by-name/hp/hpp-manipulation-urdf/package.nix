@@ -16,7 +16,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "humanoid-path-planner";
     repo = "hpp-manipulation-urdf";
-    tag = "v${finalAttrs.version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-t62zULwKR5MSoEcsWt/NYr8ojS1Ca0tSXlR9NYwtSLY=";
   };
 
