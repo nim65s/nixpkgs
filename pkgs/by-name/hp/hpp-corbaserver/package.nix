@@ -47,10 +47,10 @@ let
       hpp-core
       hpp-template-corba
       python3Packages.omniorbpy
+      python3Packages.numpy
     ];
     checkInputs = [
       psmisc
-      python3Packages.numpy
     ];
 
     enableParallelBuilding = false;
