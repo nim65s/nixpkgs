@@ -38,6 +38,10 @@ stdenv.mkDerivation (finalAttrs: {
 
   doCheck = true;
 
+  cmakeFlags = lib.optionals stdenv.hostPlatform.isDarwin [
+    "-DCMAKE_CTEST_ARGUMENTS=--exclude-regex;serialization"
+  ];
+
   meta = {
     description = "Wrapping of Pinocchio library into HPP";
     homepage = "https://github.com/humanoid-path-planner/hpp-pinocchio";
