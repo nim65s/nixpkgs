@@ -2,6 +2,7 @@
   lib,
   buildPythonPackage,
   fetchPypi,
+  fetchpatch,
   setuptools,
   numpy,
   pip,
@@ -19,6 +20,15 @@ buildPythonPackage rec {
     inherit pname version;
     hash = "sha256-oCdcIBh4TKEwKHVWfcgXYfX9Rp+rnzrA8+fDnpGANQo=";
   };
+
+  patches = [
+    # Delete unused and deprecated import
+    # This was merged upstream and can be removed on next release
+    (fetchpatch {
+      url = "https://github.com/mattloper/chumpy/pull/48.patch";
+      hash = "sha256-AAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    })
+  ];
 
   # Fix for python > 3.11
   postPatch = ''
