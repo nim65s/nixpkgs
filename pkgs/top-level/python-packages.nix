@@ -2312,6 +2312,8 @@ self: super: with self; {
 
   checksumdir = callPackage ../development/python-modules/checksumdir { };
 
+  chumpy = callPackage ../development/python-modules/chumpy { };
+
   cheetah3 = callPackage ../development/python-modules/cheetah3 { };
 
   cheroot = callPackage ../development/python-modules/cheroot { };
