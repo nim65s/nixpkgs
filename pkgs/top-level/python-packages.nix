@@ -8550,6 +8550,8 @@ self: super: with self; {
 
   mmengine = callPackage ../development/python-modules/mmengine { };
 
+  mmpose = callPackage ../development/python-modules/mmpose { };
+
   mmh3 = callPackage ../development/python-modules/mmh3 { };
 
   mmpython = callPackage ../development/python-modules/mmpython { };
