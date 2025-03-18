@@ -11,7 +11,7 @@
 
   # requirements/runtime.txt
   chumpy,
-  json_tricks,
+  json-tricks,
   matplotlib,
   munkres,
   opencv-python,
@@ -58,7 +58,7 @@ buildPythonPackage rec {
 
     # requirements/runtime.txt
     chumpy
-    json_tricks
+    json-tricks
     matplotlib
     munkres
     opencv-python
