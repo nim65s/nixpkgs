@@ -2374,6 +2374,8 @@ self: super: with self; {
 
   citeproc-py = callPackage ../development/python-modules/citeproc-py { };
 
+  cityscapes-scripts = callPackage ../development/python-modules/cityscapes-scripts { };
+
   cjkwrap = callPackage ../development/python-modules/cjkwrap { };
 
   ckcc-protocol = callPackage ../development/python-modules/ckcc-protocol { };
