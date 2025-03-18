@@ -38,7 +38,7 @@ buildPythonPackage rec {
   meta = {
     description = "Extended COCO API";
     homepage = "https://github.com/jin-s13/xtcocoapi";
-    license = lib.licenses.MIT;
+    license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ nim65s ];
   };
 }
