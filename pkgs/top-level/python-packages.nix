@@ -8552,6 +8552,8 @@ self: super: with self; {
 
   mmcv = callPackage ../development/python-modules/mmcv { };
 
+  mmdet = callPackage ../development/python-modules/mmdet { };
+
   mmengine = callPackage ../development/python-modules/mmengine { };
 
   mmpose = callPackage ../development/python-modules/mmpose { };
