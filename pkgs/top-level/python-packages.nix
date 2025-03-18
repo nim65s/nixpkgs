@@ -8562,6 +8562,8 @@ self: super: with self; {
 
   mmpose = callPackage ../development/python-modules/mmpose { };
 
+  mmpretrain = callPackage ../development/python-modules/mmpretrain { };
+
   mmh3 = callPackage ../development/python-modules/mmh3 { };
 
   mmpython = callPackage ../development/python-modules/mmpython { };
