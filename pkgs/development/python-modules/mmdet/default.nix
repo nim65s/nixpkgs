@@ -12,7 +12,7 @@
   six,
   terminaltables,
   tqdm,
-  cityscapesscripts,
+  cityscapes-scripts,
   cython,
   emoji,
   fairscale,
@@ -77,7 +77,7 @@ buildPythonPackage rec {
 
   optional-dependencies = {
     all = [
-      cityscapesscripts
+      cityscapes-scripts
       cython
       emoji
       fairscale
@@ -108,7 +108,7 @@ buildPythonPackage rec {
       transformers
     ];
     optional = [
-      cityscapesscripts
+      cityscapes-scripts
       emoji
       fairscale
       imagecorruptions
@@ -116,7 +116,7 @@ buildPythonPackage rec {
     ];
     tests = [
       asynctest
-      cityscapesscripts
+      cityscapes-scripts
       codecov
       flake8
       imagecorruptions
