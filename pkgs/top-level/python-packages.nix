@@ -18698,6 +18698,8 @@ self: super: with self; {
 
   xcffib = callPackage ../development/python-modules/xcffib { };
 
+  xtcocotools = callPackage ../development/python-modules/xtcocotools { };
+
   xdg = callPackage ../development/python-modules/xdg { };
 
   xdg-base-dirs = callPackage ../development/python-modules/xdg-base-dirs { };
