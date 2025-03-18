@@ -6526,6 +6526,8 @@ self: super: with self; {
 
   internetarchive = callPackage ../development/python-modules/internetarchive { };
 
+  interrogate = callPackage ../development/python-modules/interrogate { };
+
   interruptingcow = callPackage ../development/python-modules/interruptingcow { };
 
   intervaltree = callPackage ../development/python-modules/intervaltree { };
