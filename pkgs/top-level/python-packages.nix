@@ -7225,6 +7225,8 @@ self: super: with self; {
   kubernetes-asyncio = callPackage ../development/python-modules/kubernetes-asyncio { };
 
   kurbopy = callPackage ../development/python-modules/kurbopy { };
+  
+  kwarray = callPackage ../development/python-modules/kwarray { };
 
   l18n = callPackage ../development/python-modules/l18n { };
 
