@@ -27,7 +27,7 @@
   isort,
   parameterized,
   pytest,
-  pytest-runner,
+  #pytest-runner,
   xdoctest,
   yapf,
 
@@ -81,7 +81,7 @@ buildPythonPackage rec {
     isort
     parameterized
     pytest
-    pytest-runner
+    #pytest-runner
     xdoctest
     yapf
   ];
