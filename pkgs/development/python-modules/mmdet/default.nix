@@ -27,7 +27,7 @@
   asynctest,
   codecov,
   flake8,
-  instaboostfast,
+  #instaboostfast,  no license
   interrogate,
   isort,
   kwarray,
@@ -120,7 +120,7 @@ buildPythonPackage rec {
       codecov
       flake8
       imagecorruptions
-      instaboostfast
+      #instaboostfast
       interrogate
       isort
       kwarray
