@@ -30,6 +30,14 @@ buildPythonPackage rec {
     hash = "sha256-oyDW7GRN/Yh8xYJHo0UFT8TZ+YEQDEUYRHAGj0s3GbA=";
   };
 
+  # fix import error
+  # ref. https://github.com/econchick/interrogate/pull/148
+  postPatch = ''
+    substituteInPlace src/interrogate/utils.py --replace-fail \
+      "from py import io as py_io" \
+      "import _pytest._io as py_io"
+  '';
+
   build-system = [
     setuptools
   ];
