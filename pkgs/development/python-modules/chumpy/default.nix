@@ -26,7 +26,7 @@ buildPythonPackage rec {
     # This was merged upstream and can be removed on next release
     (fetchpatch {
       url = "https://github.com/mattloper/chumpy/pull/48.patch";
-      hash = "sha256-AAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+      hash = "sha256-C3IJnvprztV2BVHz+pWyKgwK9t6fnLXlwZccVS7mPSY=";
     })
   ];
 
