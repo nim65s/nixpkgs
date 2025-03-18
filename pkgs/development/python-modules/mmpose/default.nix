@@ -33,6 +33,10 @@
 
   # requirements/optional.txt
   requests,
+
+  # Requirements not documented
+  mmcv,
+  mmdet,
 }:
 
 buildPythonPackage rec {
@@ -69,6 +73,9 @@ buildPythonPackage rec {
 
     # requirements/optional.txt
     requests
+
+    # Requirements not documented
+    mmcv
   ];
 
   checkInputs = [
@@ -84,6 +91,9 @@ buildPythonPackage rec {
     #pytest-runner
     xdoctest
     yapf
+
+    # Requirements not documented
+    mmdet
   ];
 
   doCheck = true;
