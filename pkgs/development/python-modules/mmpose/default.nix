@@ -5,6 +5,9 @@
   setuptools,
   pytestCheckHook,
 
+  mmcv,
+  mmdet,
+
   # requirements/build.txt
   numpy,
   torch,
@@ -33,10 +36,6 @@
 
   # requirements/optional.txt
   requests,
-
-  # Requirements not documented
-  mmcv,
-  mmdet,
 }:
 
 buildPythonPackage rec {
@@ -56,6 +55,8 @@ buildPythonPackage rec {
   ];
 
   dependencies = [
+    mmcv
+
     # requirements/build.txt
     numpy
     torch
@@ -73,12 +74,10 @@ buildPythonPackage rec {
 
     # requirements/optional.txt
     requests
-
-    # Requirements not documented
-    mmcv
   ];
 
   checkInputs = [
+    mmdet
     pytestCheckHook
 
     # requirements/tests.txt
@@ -91,12 +90,19 @@ buildPythonPackage rec {
     #pytest-runner
     xdoctest
     yapf
-
-    # Requirements not documented
-    mmdet
   ];
 
   doCheck = true;
+
+  disabledTestPaths = [
+    # need mmcv < 2
+    "projects/pose_anything/datasets/datasets/mp100/test_base_dataset.py"
+    "projects/pose_anything/datasets/datasets/mp100/test_dataset.py"
+    "tests/test_external/test_mim.py"
+
+    # ImportError: cannot import name 'inference_bottom_up_pose_model' from 'mmpose.apis
+    "tools/torchserve/test_torchserver.py"
+  ];
 
   pythonImportsCheck = [
     "mmpose"
