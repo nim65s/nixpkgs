@@ -2,6 +2,7 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
+  pythonOlder,
   setuptools,
   pytestCheckHook,
   matplotlib,
@@ -46,8 +47,21 @@
   mmpretrain,
   motmetrics,
   seaborn,
+  torch
 }:
 
+let
+  # https://github.com/open-mmlab/mmdetection/blob/main/docs/en/notes/faq.md#installation
+  mmcv-210 = mmcv.overrideAttrs rec {
+    version = "2.1.0";
+    src = fetchFromGitHub {
+      owner = "open-mmlab";
+      repo = "mmcv";
+      tag = "v${version}";
+      hash = "sha256-an78tRvx18zQ5Q0ca74r4Oe2gJ9F9OfWXLbuP2+rL68=";
+    };
+  };
+in
 buildPythonPackage rec {
   pname = "mmdet";
   version = "3.3.0";
@@ -66,6 +80,7 @@ buildPythonPackage rec {
 
   dependencies = [
     matplotlib
+    mmcv-210
     numpy
     pycocotools
     scipy
@@ -73,6 +88,7 @@ buildPythonPackage rec {
     six
     terminaltables
     tqdm
+    torch
   ];
 
   optional-dependencies = {
@@ -97,7 +113,7 @@ buildPythonPackage rec {
       numpy
     ];
     mim = [
-      mmcv
+      mmcv-210
       mmengine
     ];
     multimodal = [
@@ -150,7 +166,7 @@ buildPythonPackage rec {
 
   nativeCheckInputs = [ pytestCheckHook ] ++ optional-dependencies.tests;
 
-  doCheck = true;
+  doCheck = pythonOlder "3.11"; # asynctest is unsupported on python3.11
 
   pythonImportsCheck = [
     "mmdet"
