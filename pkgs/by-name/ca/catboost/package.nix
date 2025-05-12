@@ -34,18 +34,16 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   postPatch = ''
-    substituteInPlace cmake/common.cmake \
-      --replace-fail  "\''${RAGEL_BIN}" "${ragel}/bin/ragel" \
-      --replace-fail "\''${YASM_BIN}" "${yasm}/bin/yasm"
-
     shopt -s globstar
-    for cmakelists in **/CMakeLists.*; do
-      sed -i "s/OpenSSL::OpenSSL/OpenSSL::SSL/g" $cmakelists
-      ${lib.optionalString (lib.versionOlder cudaPackages.cudaVersion "11.8") ''
-        sed -i 's/-gencode=arch=compute_89,code=sm_89//g' $cmakelists
-        sed -i 's/-gencode=arch=compute_90,code=sm_90//g' $cmakelists
-      ''}
-    done
+    substituteInPlace cmake/common.cmake \
+      --replace-fail  "\''${RAGEL_BIN}" "${lib.getExe ragel}" \
+      --replace-fail "\''${YASM_BIN}" "${lib.getExe yasm}"
+    substituteInPlace **/CMakeLists.* \
+      --replace-quiet "openssl::openssl" "OpenSSL::SSL"
+    '' + lib.optionalString (lib.versionOlder cudaPackages.cudaVersion "11.8") ''
+    substituteInPlace **/CMakeLists.* \
+      --replace-fail "-gencode=arch=compute_89,code=sm_89" "" \
+      --replace-fail "-gencode=arch=compute_90,code=sm_90" ""
   '';
 
   outputs = [
