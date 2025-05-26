@@ -1,0 +1,21 @@
+--- result/SimTKcommon/include/SimTKcommon/internal/common.h	1970-01-01 01:00:01.000000000 +0100
++++ /tmp/common.h	2025-05-26 23:09:40.974932082 +0200
+@@ -653,10 +653,14 @@
+     return right < left;
+ }
+ 
+-template<class L, class R> inline
+-bool operator<=(const L& left, const R& right)
+-{   // test if left <= right, in terms of operator<
+-    return !(right < left);
++#include <type_traits>
++
++template <class L, class R>
++std::enable_if_t<
++    std::conjunction_v<std::is_arithmetic<L>, std::is_arithmetic<R>>, bool>
++operator<=(const L& left, const R& right)
++{
++    return !(left > right);
+ }
+ 
+ template<class L, class R> inline

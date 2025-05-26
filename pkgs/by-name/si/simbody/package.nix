@@ -28,6 +28,10 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-SS4Rhe7G2Fc0Gj/9jeyU9gVTTjtRfFT9nhnBDDF4NjM=";
   };
 
+  patches = [
+    ./fix-fmt-constexpr.patch
+  ];
+
   postPatch = ''
     substituteInPlace cmake/pkgconfig/simbody.pc.in --replace-fail "$""{prefix}/" ""
   '';
