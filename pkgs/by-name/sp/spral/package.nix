@@ -1,24 +1,31 @@
 {
-  blas,
-  fetchFromGitHub,
-  gfortran,
-  lapack,
   lib,
-  llvmPackages,
-  meson,
-  metis,
-  ninja,
+
+  fetchFromGitHub,
   stdenv,
+
+  nix-update-script,
+
+  # nativeBuildInputs
+  gfortran,
+  meson,
+  ninja,
+
+  # buildInputs
+  blas,
+  lapack,
+  llvmPackages,
+  metis,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "spral";
   version = "2025.05.20";
 
   src = fetchFromGitHub {
     owner = "ralna";
     repo = "spral";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-9QEcAOFB3CtGNqr8LoDaj2vP3KMONlUVooeXECtGsxc=";
   };
 
@@ -48,11 +55,13 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
 
+  passthru.updateScript = nix-update-script { };
+
   meta = {
     description = "Sparse Parallel Robust Algorithms Library";
     homepage = "https://github.com/ralna/spral";
-    changelog = "https://github.com/ralna/spral/blob/${src.rev}/ChangeLog";
+    changelog = "https://github.com/ralna/spral/blob/${finalAttrs.src.rev}/ChangeLog";
     license = lib.licenses.bsd3;
     maintainers = with lib.maintainers; [ nim65s ];
   };
-}
+})
