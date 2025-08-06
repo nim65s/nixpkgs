@@ -17,6 +17,14 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-p1pxqJ38h6RKXMg1t+2RHlfmRKPuM18pbUarUx/w9lw=";
   };
 
+  # Fix for CMake v4
+  # ref. https://github.com/giaf/blasfeo/commit/75078e2b6153d1c8bc5329e83a82d4d4d3eefd76
+  postPatch = ''
+    substituteInPlace CMakeLists.txt --replace-fail \
+      "cmake_minimum_required(VERSION 2.8.11)" \
+      "cmake_minimum_required(VERSION 3.5)"
+  '';
+
   nativeBuildInputs = [ cmake ];
 
   cmakeFlags = [ "-DTARGET=${withTarget}" ];
