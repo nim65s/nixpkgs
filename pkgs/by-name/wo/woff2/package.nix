@@ -44,6 +44,11 @@ stdenv.mkDerivation rec {
   postPatch = ''
     # without this binaries only get built if shared libs are disable
     sed 's@^if (NOT BUILD_SHARED_LIBS)$@if (TRUE)@g' -i CMakeLists.txt
+
+    # fix for CMake v4
+    substituteInPlace CMakeLists.txt --replace-fail \
+      "cmake_minimum_required(VERSION 2.8.6)" \
+      "cmake_minimum_required(VERSION 3.5)"
   '';
 
   meta = with lib; {
