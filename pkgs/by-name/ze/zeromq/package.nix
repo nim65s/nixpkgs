@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchpatch,
   cmake,
   pkg-config,
   libsodium,
@@ -45,6 +46,20 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "ENABLE_CURVE" true)
     (lib.cmakeBool "ENABLE_DRAFTS" enableDrafts)
     (lib.cmakeBool "WITH_LIBSODIUM" true)
+  ];
+
+  # Fix build with CMake v4
+  # ref https://github.com/zeromq/libzmq/pull/4776
+  # This was merged upstream and can be removed on next release
+  patches = [
+    (fetchpatch {
+      url = "https://github.com/zeromq/libzmq/commit/34f7fa22022bed9e0e390ed3580a1c83ac4a2834.patch";
+      hash = "sha256-oauAZV6pThplcn2v9mQxhxlUhYgpbly0JBLYik+zoJE=";
+    })
+    (fetchpatch {
+      url = "https://github.com/zeromq/libzmq/pull/4776/commits/1e65e8e61d693b14dd2f9e3ace4ffae46159691c.patch";
+      hash = "sha256-FKvZi7pTUx+wLUR8Suf+pRFg8I5OHpJ93gEmTxUrmO4=";
+    })
   ];
 
   postPatch = ''
