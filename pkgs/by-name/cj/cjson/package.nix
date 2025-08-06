@@ -22,10 +22,16 @@ stdenv.mkDerivation rec {
     lib.cmakeBool "ENABLE_CUSTOM_COMPILER_FLAGS" false
   );
 
-  # cJSON actually uses C99 standard, not C89
-  # https://github.com/DaveGamble/cJSON/issues/275
   postPatch = ''
+    # cJSON actually uses C99 standard, not C89
+    # https://github.com/DaveGamble/cJSON/issues/275
     substituteInPlace CMakeLists.txt --replace -std=c89 -std=c99
+
+    # Fix for CMake v4
+    # ref. https://github.com/DaveGamble/cJSON/pull/949
+    substituteInPlace CMakeLists.txt --replace \
+      "cmake_minimum_required(VERSION 3.0)" \
+      "cmake_minimum_required(VERSION 3.0...4.0)"
   '';
 
   meta = with lib; {
