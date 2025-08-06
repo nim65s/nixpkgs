@@ -16,6 +16,12 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-UyMXr8Vc6kDOx1/lD2YKPiHdaTotXAF9ak0yQuwrSUA=";
   };
 
+  postPatch = ''
+    substituteInPlace apps/CMakeLists.txt --replace-fail \
+      "cmake_minimum_required(VERSION 2.8)" \
+      "cmake_minimum_required(VERSION 3.9...3.12)"
+  '';
+
   outputs = [
     "out"
     "dev"
