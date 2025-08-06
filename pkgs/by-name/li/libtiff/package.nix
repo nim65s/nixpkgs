@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitLab,
+  fetchpatch,
   nix-update-script,
 
   cmake,
@@ -53,6 +54,13 @@ stdenv.mkDerivation (finalAttrs: {
     # libc++abi 11 has an `#include <version>`, this picks up files name
     # `version` in the project's include paths
     ./rename-version.patch
+    # Fix for CMake v4
+    # ref. https://gitlab.com/libtiff/libtiff/-/merge_requests/670
+    # This was merged upstream and can be removed on next release
+    (fetchpatch {
+      url = "https://gitlab.com/libtiff/libtiff/-/commit/d1279f0f9c8fee724c380523a7a6cf60c690521d.patch";
+      hash = "sha256-7EwfgG8zYwyNPIpyCYq8PSbf1TBmo4N36e96GB3wWPo=";
+    })
   ];
 
   postPatch = ''
