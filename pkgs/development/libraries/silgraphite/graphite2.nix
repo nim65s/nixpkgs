@@ -3,6 +3,7 @@
   stdenv,
   llvmPackages,
   fetchurl,
+  fetchpatch,
   pkg-config,
   freetype,
   cmake,
@@ -53,6 +54,22 @@ stdenv.mkDerivation (finalAttrs: {
     # headers are located in the dev output:
     substituteInPlace CMakeLists.txt \
       --replace-fail ' ''${CMAKE_INSTALL_PREFIX}/include' " ${placeholder "dev"}/include"
+
+    # CMake: Raised required version to 3.5
+    # ref. https://github.com/silnrsi/graphite/pull/92
+    substituteInPlace CMakeLists.txt --replace-fail \
+        "CMAKE_MINIMUM_REQUIRED(VERSION 2.8.0 FATAL_ERROR)" \
+        "cmake_minimum_required(VERSION 3.5.0)"
+    substituteInPlace CMakeLists.txt src/CMakeLists.txt \
+      --replace-fail "cmake_policy(SET CMP0012 NEW)" ""
+    substituteInPlace \
+      gr2fonttest/CMakeLists.txt \
+      src/CMakeLists.txt \
+      tests/bittwiddling/CMakeLists.txt \
+      tests/json/CMakeLists.txt \
+      tests/sparsetest/CMakeLists.txt \
+      tests/utftest/CMakeLists.txt \
+      --replace-fail "CMAKE_MINIMUM_REQUIRED(VERSION 2.8.0 FATAL_ERROR)" ""
   '';
 
   cmakeFlags = lib.optionals static [
