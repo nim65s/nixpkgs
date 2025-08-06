@@ -48,11 +48,11 @@ stdenv.mkDerivation (finalAttrs: {
     + lib.optionalString isMinimalBuild "-minimal"
     + lib.optionalString cursesUI "-cursesUI"
     + lib.optionalString qt5UI "-qt5UI";
-  version = "4.0.3";
+  version = "4.1.0";
 
   src = fetchurl {
     url = "https://cmake.org/files/v${lib.versions.majorMinor finalAttrs.version}/cmake-${finalAttrs.version}.tar.gz";
-    hash = "sha256-jTU3t7dzJmDqJHOY8Wa+iS/mEx1jzCkZRLRbkSefP/s=";
+    hash = "sha256-ge6BcAKIZVgajhDq8FWvtiD6S6oL62OHJBJBqXUDNQg=";
   };
 
   patches =
@@ -119,6 +119,11 @@ stdenv.mkDerivation (finalAttrs: {
       --subst-var-by libc_lib ${lib.getLib stdenv.cc.libc}
     # CC_FOR_BUILD and CXX_FOR_BUILD are used to bootstrap cmake
     configureFlags="--parallel=''${NIX_BUILD_CORES:-1} CC=$CC_FOR_BUILD CXX=$CXX_FOR_BUILD $configureFlags $cmakeFlags"
+
+    substituteInPlace Source/cmFindPackageCommand.cxx --replace-fail \
+      'paths.AddEnvPath("CMAKE_PREFIX_PATH");' \
+      'paths.AddEnvPath("CMAKE_PREFIX_PATH");
+       paths.AddEnvPath("NIXPKGS_CMAKE_PREFIX_PATH");'
   '';
 
   # The configuration script is not autoconf-based, although being similar;

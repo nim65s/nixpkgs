@@ -14,15 +14,3 @@ index a7e00fd930..c988752735 100644
    paths.AddEnvPath(var);
  
    if (this->CMakePathName == "PROGRAM") {
-diff --git a/Source/cmFindPackageCommand.cxx b/Source/cmFindPackageCommand.cxx
-index ce2f53625e..70f0161aeb 100644
---- a/Source/cmFindPackageCommand.cxx
-+++ b/Source/cmFindPackageCommand.cxx
-@@ -2312,6 +2312,7 @@ void cmFindPackageCommand::FillPrefixesCMakeEnvironment()
- 
-   // And now the general CMake environment variables
-   paths.AddEnvPath("CMAKE_PREFIX_PATH");
-+  paths.AddEnvPath("NIXPKGS_CMAKE_PREFIX_PATH");
-   if (this->DebugMode) {
-     debugBuffer = cmStrCat(debugBuffer,
-                            "CMAKE_PREFIX_PATH env variable "
