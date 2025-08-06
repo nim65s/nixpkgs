@@ -17,6 +17,14 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-M3GocT0hodw3Sc2NHcFDiPVZ1XN7BqIUuYLW8OaXMqM=";
   };
 
+  # fix for CMake v4
+  # ref. https://github.com/ros/console_bridge/pull/102
+  postPatch = ''
+    substituteInPlace CMakeLists.txt --replace-fail \
+      "cmake_minimum_required(VERSION 3.0.2)" \
+      "cmake_minimum_required(VERSION 3.20)"
+  '';
+
   nativeBuildInputs = [
     cmake
     validatePkgConfig
