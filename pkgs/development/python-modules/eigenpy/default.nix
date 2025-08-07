@@ -33,6 +33,10 @@ buildPythonPackage rec {
     hash = "sha256-BCsEW7eXlCnVILaB+1j0rFDuCkJ6Rs2HJMzTqNsMfzs=";
   };
 
+  postPatch = ''
+    substituteInPlace CMakeLists.txt --replace-fail "cmake_minimum_required(VERSION 3.10)" "cmake_minimum_required(VERSION 3.22)"
+  '';
+
   outputs = [
     "dev"
     "doc"

@@ -26,6 +26,10 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-2X1chL4tYQXo50W/C5z+IVA1DGPcPdA378lh+7Bs2OE=";
   };
 
+  postPatch = ''
+    substituteInPlace CMakeLists.txt --replace-fail "cmake_minimum_required(VERSION 3.10)" "cmake_minimum_required(VERSION 3.22)"
+  '';
+
   strictDeps = true;
 
   nativeBuildInputs = [
