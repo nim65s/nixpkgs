@@ -19,6 +19,13 @@ stdenv.mkDerivation rec {
     ./arm64-check.patch
   ];
 
+  # Fix for CMake v4
+  postPatch = ''
+    substituteInPlace CMakeLists.txt --replace-fail \
+      "cmake_minimum_required (VERSION 3.1 FATAL_ERROR)" \
+      "cmake_minimum_required (VERSION 3.5)"
+  '';
+
   outputs = [
     "out"
     "dev"
