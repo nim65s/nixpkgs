@@ -55,6 +55,13 @@ stdenv.mkDerivation rec {
 
   patches = [
     ./darwin-__rdtsc.patch
+    # Fix for CMake v4
+    # this was merged upstream and can be removed on next release
+    (fetchpatch2 {
+      url = "https://bitbucket.org/multicoreware/x265_git/commits/51ae8e922bcc4586ad4710812072289af91492a8/raw";
+      hash = "sha256-urA2Z0S4ZXdM16oOwJ62TIaosLX7iD5rU8LOlBQOGc8=";
+      stripLen = 1;
+    })
   ]
   # TODO: remove after update to version 4.2
   ++ lib.optionals (stdenv.hostPlatform.isAarch32 && stdenv.hostPlatform.isLinux) [
