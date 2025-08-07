@@ -18,6 +18,15 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-NLy9GuP4OT/kKAIIDXSHtsmaBzXRuFohFM/aM+46cao=";
   };
 
+  # fix for CMake v4
+  # ref. https://github.com/Haivision/srt/pull/3167
+  # This was merged upstream and can be removed on next release
+  postPatch = ''
+    substituteInPlace CMakeLists.txt --replace-fail \
+      "cmake_minimum_required (VERSION 2.8.12 FATAL_ERROR)" \
+      "cmake_minimum_required (VERSION 3.5 FATAL_ERROR)"
+  '';
+
   nativeBuildInputs = [ cmake ];
 
   buildInputs = [
