@@ -30,6 +30,15 @@ stdenv.mkDerivation (finalAttrs: {
     })
   ];
 
+  # Fix for CMake v4
+  # ref. https://github.com/felixlen/trlib/pull/25
+  # This PR was merged upstream, so the patch can be removed on next release
+  postPatch = ''
+    substituteInPlace CMakeLists.txt --replace-fail \
+      "cmake_minimum_required (VERSION 3.1)" \
+      "cmake_minimum_required (VERSION 3.13)"
+  '';
+
   nativeBuildInputs = [ cmake ];
   buildInputs = [
     blas
