@@ -8,11 +8,13 @@
 
   # nativeBuildInputs
   cmake,
+  o3de-azslc,
   pkg-config,
   writableTmpDirAsHomeHook,
 
   # buildInputs
   assimp,
+  astc-encoder,
   directx-shader-compiler,
   expat,
   gbenchmark,
@@ -168,6 +170,12 @@ stdenv.mkDerivation (finalAttrs: {
            INTERFACE_INCLUDE_DIRECTORIES \"$""{mcpp_INCLUDE_DIR}\"
            INTERFACE_LINK_LIBRARIES \"$""{mcpp_LIBRARIES}\")
 
+         find_program(azslc azslc REQUIRED)
+         add_library(3rdParty::azslc INTERFACE IMPORTED)
+
+         find_program(astc-encoder astcenc-sse2 REQUIRED)
+         add_library(3rdParty::astc-encoder INTERFACE IMPORTED)
+
          add_library(3rdParty::assimp ALIAS assimp::assimp)
          add_library(3rdParty::expat ALIAS expat::expat)
          add_library(3rdParty::GoogleBenchmark ALIAS benchmark::benchmark)
@@ -242,6 +250,14 @@ stdenv.mkDerivation (finalAttrs: {
       --replace-fail \
         "ly_pip_install_local_package_editable($""{CMAKE_CURRENT_LIST_DIR} atom_rpi_tools)" \
         ""
+
+    substituteInPlace Gems/LmbrCentral/Code/CMakeLists.txt \
+      --replace-fail \
+        "ly_add_target_files(
+            TARGETS $""{gem_name}.Editor
+            FILES $""{lrelease_files}
+        )" \
+        ""
   '';
 
   cmakeFlags = [
@@ -251,12 +267,14 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     cmake
     libsForQt5.wrapQtAppsHook
+    o3de-azslc
     pkg-config
     writableTmpDirAsHomeHook
   ];
 
   buildInputs = [
     assimp
+    astc-encoder
     directx-shader-compiler
     expat
     gbenchmark
