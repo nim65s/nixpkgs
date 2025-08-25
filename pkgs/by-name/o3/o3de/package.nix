@@ -1,28 +1,36 @@
 {
   lib,
   stdenv,
+
   fetchFromGitHub,
+  nix-update-script,
+
+  # nativeBuildInputs
   cmake,
   pkg-config,
+  writableTmpDirAsHomeHook,
+
+  # buildInputs
   libunwind,
   zstd,
   zlib,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "o3de";
   version = "2409.1";
 
   src = fetchFromGitHub {
     owner = "o3de";
     repo = "o3de";
-    rev = version;
+    tag = finalAttrs.version;
     hash = "sha256-PLsEpcCbRlvOnaEYjGJ/PqS/LtpreXjWyX5h0DEKo5s=";
   };
 
   nativeBuildInputs = [
     cmake
     pkg-config
+    writableTmpDirAsHomeHook
   ];
 
   buildInputs = [
@@ -31,9 +39,7 @@ stdenv.mkDerivation rec {
     zlib
   ];
 
-  preConfigure = ''
-    HOME=$(mktemp -d)
-  '';
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "multi-platform 3D engine";
@@ -46,4 +52,4 @@ stdenv.mkDerivation rec {
     mainProgram = "o3de";
     platforms = lib.platforms.unix ++ lib.platforms.windows;
   };
-}
+})
