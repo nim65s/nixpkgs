@@ -43,7 +43,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "multi-platform 3D engine";
-    homepage = "https://github.com/o3de/o3de";
+    homepage = "https://o3de.org/";
     license = with lib.licenses; [
       asl20
       mit
