@@ -18,13 +18,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "o3de";
-  version = "2409.1";
+  version = "2505.1";
 
   src = fetchFromGitHub {
     owner = "o3de";
     repo = "o3de";
     tag = finalAttrs.version;
-    hash = "sha256-PLsEpcCbRlvOnaEYjGJ/PqS/LtpreXjWyX5h0DEKo5s=";
+    hash = "sha256-L6nAX5+LzRsHVq9fpOKXgMkdI2ytVG3OVtQeACFz35M=";
   };
 
   nativeBuildInputs = [
