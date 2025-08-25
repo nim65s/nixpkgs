@@ -20,11 +20,15 @@
   gbenchmark,
   gtest,
   cityhash,
+  ispc-texture-compressor,
+  libsquish,
   libtiff,
   libunwind,
   lua54Packages,
   lz4,
   mcpp,
+  openexr,
+  openimageio2,
   openssl,
   rapidjson,
   rapidxml,
@@ -121,6 +125,8 @@ stdenv.mkDerivation (finalAttrs: {
          find_package(GTest REQUIRED)
          find_package(Lua REQUIRED)
          find_package(lz4 REQUIRED)
+         find_package(OpenEXR REQUIRED)
+         find_package(OpenImageIO REQUIRED)
          find_package(OpenSSL REQUIRED)
          find_package(Python REQUIRED)
          find_package(pybind11 REQUIRED)
@@ -176,6 +182,20 @@ stdenv.mkDerivation (finalAttrs: {
          find_program(astc-encoder astcenc-sse2 REQUIRED)
          add_library(3rdParty::astc-encoder INTERFACE IMPORTED)
 
+         find_library(squish_LIBRARIES squish REQUIRED)
+         find_path(squish_INCLUDE_DIR squish.h REQUIRED)
+         add_library(3rdParty::squish-ccr INTERFACE IMPORTED)
+         set_target_properties(3rdParty::squish-ccr PROPERTIES
+           INTERFACE_INCLUDE_DIRECTORIES \"$""{squish_INCLUDE_DIR}\"
+           INTERFACE_LINK_LIBRARIES \"$""{squish_LIBRARIES}\")
+
+         find_library(ISPCTexComp_LIBRARIES ispc_texcomp REQUIRED)
+         find_path(ISPCTexComp_INCLUDE_DIR ispc_texcomp.h REQUIRED PATH_SUFFIXES ISPC)
+         add_library(3rdParty::ISPCTexComp INTERFACE IMPORTED)
+         set_target_properties(3rdParty::ISPCTexComp PROPERTIES
+           INTERFACE_INCLUDE_DIRECTORIES \"$""{ISPCTexComp_INCLUDE_DIR}\"
+           INTERFACE_LINK_LIBRARIES \"$""{ISPCTexComp_LIBRARIES}\")
+
          add_library(3rdParty::assimp ALIAS assimp::assimp)
          add_library(3rdParty::expat ALIAS expat::expat)
          add_library(3rdParty::GoogleBenchmark ALIAS benchmark::benchmark)
@@ -183,6 +203,8 @@ stdenv.mkDerivation (finalAttrs: {
          add_library(3rdParty::googletest::GTest ALIAS GTest::gtest)
          add_library(3rdParty::Lua ALIAS Lua::Lua)
          add_library(3rdParty::lz4 ALIAS LZ4::lz4)
+         add_library(3rdParty::OpenEXR ALIAS OpenEXR::OpenEXR)
+         add_library(3rdParty::OpenImageIO ALIAS OpenImageIO::OpenImageIO)
          add_library(3rdParty::OpenSSL ALIAS OpenSSL::SSL)
          add_library(3rdParty::pybind11 ALIAS pybind11::pybind11)
          add_library(3rdParty::Qt::Concurrent ALIAS Qt5::Concurrent)
@@ -258,6 +280,11 @@ stdenv.mkDerivation (finalAttrs: {
             FILES $""{lrelease_files}
         )" \
         ""
+
+    substituteInPlace Gems/AtomLyIntegration/CommonFeatures/Code/CMakeLists.txt \
+      --replace-fail \
+        "3rdParty::OpenImageIO" \
+        "# 3rdParty::OpenImageIO"
   '';
 
   cmakeFlags = [
@@ -280,12 +307,16 @@ stdenv.mkDerivation (finalAttrs: {
     gbenchmark
     gtest
     cityhash
+    ispc-texture-compressor
     libsForQt5.qtbase
+    libsquish
     libunwind
     libtiff
     lua54Packages.lua
     lz4
     mcpp
+    openexr
+    openimageio2
     openssl
     rapidjson
     rapidxml
