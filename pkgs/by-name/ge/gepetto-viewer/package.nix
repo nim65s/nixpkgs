@@ -8,16 +8,21 @@
   lib,
   jrl-cmakemodules,
   libsForQt5,
+  qt6Packages,
   makeWrapper,
   openscenegraph,
-  osgqt,
   pkg-config,
   python3Packages,
   qgv,
   stdenv,
   runCommand,
+  writableTmpDirAsHomeHook,
+
+  qt6Support ? false,
 }:
 let
+  qt = if qt6Support then qt6Packages else libsForQt5;
+  pythonqt = if qt6Support then python3Packages.python-qt-qt6 else python3Packages.python-qt;
   gepetto-viewer = stdenv.mkDerivation (finalAttrs: {
     pname = "gepetto-viewer";
     version = "6.0.0";
@@ -43,16 +48,17 @@ let
 
     buildInputs = [
       python3Packages.boost
-      python3Packages.python-qt
-      libsForQt5.qtbase
+      pythonqt
+      qt.qtbase
     ];
 
     nativeBuildInputs = [
       cmake
       doxygen
-      libsForQt5.wrapQtAppsHook
+      qt.wrapQtAppsHook
       pkg-config
       python3Packages.python
+      writableTmpDirAsHomeHook
     ]
     ++ lib.optionals (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64) [
       darwin.autoSignDarwinBinariesHook
@@ -61,7 +67,7 @@ let
     propagatedBuildInputs = [
       jrl-cmakemodules
       openscenegraph
-      osgqt
+      qt.osgqt
       qgv
     ];
 
@@ -84,9 +90,6 @@ let
 
     # Fontconfig error: Cannot load default config file: No such file: (null)
     env.FONTCONFIG_FILE = "${fontconfig.out}/etc/fonts/fonts.conf";
-
-    # Fontconfig error: No writable cache directories
-    preBuild = "export XDG_CACHE_HOME=$(mktemp -d)";
 
     passthru.withPlugins =
       plugins:
