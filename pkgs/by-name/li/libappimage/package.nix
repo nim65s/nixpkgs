@@ -37,6 +37,13 @@ stdenv.mkDerivation rec {
       url = "https://github.com/AppImageCommunity/libappimage/commit/1e0515b23b90588ce406669134feca56ddcbbe43.patch";
       hash = "sha256-WIMvXNqC1stgPiBTRpXHWq3edIRnQomtRSW2qO52TRo=";
     })
+
+    # Fix build with cmake 4
+    # FIXME: remove in next release
+    (fetchpatch {
+      url = "https://github.com/AppImageCommunity/libappimage/commit/e5f6ea562611d534dc8e899a12ddf15c50e820be.patch";
+      hash = "sha256-P6fPoiqVX3TrKGrU2EXIMBpQLGl7xNcy41Iq7vRM+n8=";
+    })
   ];
 
   postPatch = ''
@@ -51,6 +58,8 @@ stdenv.mkDerivation rec {
     "-DUSE_SYSTEM_SQUASHFUSE=1"
     "-DUSE_SYSTEM_XDGUTILS=1"
     "-DUSE_SYSTEM_XZ=1"
+    # cmake 4 compat, remove in next update
+    "-DCMAKE_POLICY_VERSION_MINIMUM=3.6"
   ];
 
   nativeBuildInputs = [
