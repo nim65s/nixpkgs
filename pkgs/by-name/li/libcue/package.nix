@@ -24,6 +24,11 @@ stdenv.mkDerivation rec {
     flex
   ];
 
+  cmakeFlags = [
+    # cmake 4 compat, remove when fixed upstream
+    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+  ];
+
   doCheck = true;
 
   meta = with lib; {
