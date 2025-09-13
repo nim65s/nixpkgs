@@ -47,6 +47,9 @@ buildPythonPackage rec {
   #  E   UserWarning: Distutils was imported before Setuptools, but importing Setuptools also replaces the `distutils` module in `sys.modules`. This may lead to undesirable behaviors or errors. To avoid these issues, avoid using distutils directly, ensure that setuptools is installed in the traditional way (e.g. not an editable install), and/or make sure that setuptools is always imported before distutils.
   postPatch = ''
     sed -i "/'error',/d" pyproject.toml
+
+    # cmake 4 compat
+    substituteInPlace tests/samples/issue-335-support-cmake-source-dir/CMakeLists.txt --replace-fail "VERSION 3.2" "VERSION 3.5"
   '';
 
   build-system = [
@@ -93,6 +96,7 @@ buildPythonPackage rec {
     "test_hello_sdist"
     "test_manifest_in_sdist"
     "test_sdist_with_symlinks"
+    "test_make_without_configure_fails" # expects specific output format, breaks with cmake 4
   ];
 
   meta = with lib; {
