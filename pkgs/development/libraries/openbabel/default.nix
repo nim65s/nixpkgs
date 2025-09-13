@@ -28,6 +28,11 @@ stdenv.mkDerivation rec {
     hash = "sha256-V0wrZVrojCZ9Knc5H6cPzPoYWVosRZ6Sn4PX+UFEfHY=";
   };
 
+  patches = [
+    # cmake 4 compat, upstream PR: https://github.com/openbabel/openbabel/pull/2784
+    ./cmake4.patch
+  ];
+
   postPatch = ''
     sed '1i#include <ctime>' -i include/openbabel/obutil.h # gcc12
   '';
