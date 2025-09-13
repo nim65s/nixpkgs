@@ -74,6 +74,9 @@ let
       (lib.cmakeBool "USE_SYSTEM_LIBS" true)
       # 'clog' tests set 'CXX_STANDARD 11'; this conflicts with our 'gtest'.
       (lib.cmakeBool "CLOG_BUILD_TESTS" false)
+
+      # cmake 4 compat, remove in next update
+      (lib.cmakeFeature "CMAKE_POLICY_VERSION_MINIMUM" "3.5")
     ];
   };
 
@@ -219,6 +222,9 @@ effectiveStdenv.mkDerivation rec {
     (lib.cmakeBool "onnxruntime_USE_CUDA" cudaSupport)
     (lib.cmakeBool "onnxruntime_USE_NCCL" (cudaSupport && ncclSupport))
     (lib.cmakeBool "onnxruntime_ENABLE_LTO" (!cudaSupport || cudaPackages.cudaOlder "12.8"))
+
+    # cmake 4 compat, remove in next update
+    (lib.cmakeFeature "CMAKE_POLICY_VERSION_MINIMUM" "3.5")
   ]
   ++ lib.optionals pythonSupport [
     (lib.cmakeBool "onnxruntime_ENABLE_PYTHON" true)
