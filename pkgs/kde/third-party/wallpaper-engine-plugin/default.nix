@@ -10,6 +10,7 @@
   pkg-config,
   python3,
   qtbase,
+  qtdeclarative,
   qtmultimedia,
   qtwebchannel,
   qtwebengine,
@@ -36,6 +37,8 @@ mkKdeDerivation {
   ];
 
   extraBuildInputs = [
+    qtbase
+    qtdeclarative
     extra-cmake-modules
     libplasma
     lz4
@@ -52,6 +55,8 @@ mkKdeDerivation {
       ]
     ))
     (lib.cmakeFeature "Qt6_DIR" "${qtbase}/lib/cmake/Qt6")
+    # cmake 4 compat, remove in next update
+    (lib.cmakeFeature "CMAKE_POLICY_VERSION_MINIMUM" "3.5")
   ];
 
   postInstall = ''
