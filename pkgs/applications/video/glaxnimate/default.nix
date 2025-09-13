@@ -79,6 +79,11 @@ stdenv.mkDerivation rec {
     python3WithLibs
   ];
 
+  cmakeFlags = [
+    # cmake 4 compat, remove in next update
+    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+  ];
+
   # Translation needs to be separately compiled
   # https://gitlab.com/mattbas/glaxnimate/-/issues/648
   buildFlags = [ "translations" ];
