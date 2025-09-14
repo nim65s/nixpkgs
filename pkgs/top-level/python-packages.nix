@@ -11239,7 +11239,7 @@ self: super: with self; {
 
   osprofiler = callPackage ../development/python-modules/osprofiler { };
 
-  osqp = callPackage ../development/python-modules/osqp { };
+  osqp = callPackage ../development/python-modules/osqp { inherit (pkgs) osqp; };
 
   osrparse = callPackage ../development/python-modules/osrparse { };
 
