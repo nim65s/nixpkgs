@@ -19,6 +19,14 @@ stdenv.mkDerivation rec {
     fetchSubmodules = true;
   };
 
+  # Fix for CMake v4
+  # ref. https://github.com/google/crc32c/pull/68, merged upstream
+  postPatch = ''
+    substituteInPlace CMakeLists.txt --replace-fail \
+      "cmake_minimum_required(VERSION 3.1)" \
+      "cmake_minimum_required(VERSION 3.16)"
+  '';
+
   nativeBuildInputs = [ cmake ];
   buildInputs = [ gflags ];
 
