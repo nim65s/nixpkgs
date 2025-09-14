@@ -35,9 +35,26 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  # Required to activate ILP64.
-  # See https://github.com/Reference-ScaLAPACK/scalapack/pull/19
-  postPatch = lib.optionalString passthru.isILP64 ''
+  postPatch = ''
+    # fix for CMake v4
+    # ref. https://github.com/Reference-ScaLAPACK/scalapack/pull/123
+    # merged upstream
+    substituteInPlace BLACS/INSTALL/CMakeLists.txt --replace-fail \
+      "cmake_minimum_required(VERSION 2.8)" \
+      "cmake_minimum_required(VERSION 3.26...4.0)"
+    substituteInPlace CMakeLists.txt --replace-fail \
+      "cmake_minimum_required(VERSION 3.9)" \
+      "cmake_minimum_required(VERSION 3.26...4.0)"
+
+    # propagate fortran compiler
+    substituteInPlace CMAKE/FortranMangling.cmake --replace-fail \
+      "-G $""{CMAKE_GENERATOR} $""{BUILD_TYPE}" \
+      "-G $""{CMAKE_GENERATOR} $""{BUILD_TYPE}
+      -DCMAKE_Fortran_COMPILER=${lib.getDev mpi}/bin/mpif90"
+  ''
+  + lib.optionalString passthru.isILP64 ''
+    # Required to activate ILP64.
+    # See https://github.com/Reference-ScaLAPACK/scalapack/pull/19
     sed -i 's/INTSZ = 4/INTSZ = 8/g'   TESTING/EIG/* TESTING/LIN/*
     sed -i 's/INTGSZ = 4/INTGSZ = 8/g' TESTING/EIG/* TESTING/LIN/*
 
