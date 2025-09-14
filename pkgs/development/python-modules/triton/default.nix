@@ -16,6 +16,7 @@
   pybind11,
   python,
   pytestCheckHook,
+  pythonRelaxDepsHook,
   writableTmpDirAsHomeHook,
   stdenv,
   replaceVars,
@@ -89,13 +90,21 @@ buildPythonPackage rec {
       substituteInPlace third_party/amd/backend/compiler.py \
         --replace-fail 'lld = Path("/opt/rocm/llvm/bin/ld.lld")' \
         "import os;lld = Path(os.getenv('HIP_PATH', '/opt/rocm/')"' + "/llvm/bin/ld.lld")'
+    ''
+    # relax for CMake v4
+    + ''
+      substituteInPlace pyproject.toml \
+        --replace-fail "cmake>=3.20,<4.0" "cmake"
     '';
+
+  pythonRelaxDeps = [ "cmake" ];
 
   build-system = [ setuptools ];
 
   nativeBuildInputs = [
     cmake
     ninja
+    pythonRelaxDepsHook
 
     # Note for future:
     # These *probably* should go in depsTargetTarget
