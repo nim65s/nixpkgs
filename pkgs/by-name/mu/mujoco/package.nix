@@ -113,6 +113,7 @@ stdenv.mkDerivation (finalAttrs: {
   cmakeFlags = [
     (lib.cmakeBool "MUJOCO_SIMULATE_USE_SYSTEM_GLFW" true)
     (lib.cmakeBool "MUJOCO_SAMPLES_USE_SYSTEM_GLFW" true)
+    (lib.cmakeFeature "CMAKE_POLICY_VERSION_MINIMUM" "3.5")
   ];
 
   # Move things into place so that cmake doesn't try downloading dependencies.
