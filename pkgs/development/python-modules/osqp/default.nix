@@ -95,6 +95,10 @@ buildPythonPackage rec {
   disabledTests = [
     # Need an unfree license package - mkl
     "test_issue14"
+
+    # codegen is not installed
+    "codegen_matrices_tests"
+    "codegen_vectors_tests"
   ];
 
   meta = {
