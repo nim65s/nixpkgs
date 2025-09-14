@@ -28,6 +28,7 @@ stdenv.mkDerivation (finalAttrs: {
   propagatedBuildInputs = [ openscenegraph ];
 
   cmakeFlags = [
+    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
     "-DDESIRED_QT_VERSION=5"
     "-DOpenGL_GL_PREFERENCE=GLVND"
   ];
