@@ -21,6 +21,13 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-L6uBRXaPJZinIRTm+x+wnXmlVkSlWm4XMB5yX/wxg2A=";
   };
 
+  # ref. https://github.com/coin-or/qpOASES/pull/153
+  postPatch = ''
+    substituteInPlace CMakeLists.txt --replace-fail \
+      "cmake_minimum_required(VERSION 2.6)" \
+      "cmake_minimum_required(VERSION 3.18)"
+  '';
+
   nativeBuildInputs = [ cmake ];
 
   cmakeFlags = [
