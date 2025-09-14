@@ -32,13 +32,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "pymeshlab";
-  version = "2023.12";
+  version = "2025.7";
 
   src = fetchFromGitHub {
     owner = "cnr-isti-vclab";
     repo = "pymeshlab";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-IOlRdXoUPOJt67g3HqsLchV5aL+JUEks2y1Sy+wpwsg=";
+    hash = "sha256-1SibafM3eAUV8UdqpRG2j6dLYXpegM+4P1LcIU4cJww=";
     fetchSubmodules = true;
   };
 
