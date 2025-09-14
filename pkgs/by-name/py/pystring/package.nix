@@ -4,6 +4,8 @@
   fetchFromGitHub,
   fetchpatch,
   cmake,
+
+  static ? stdenv.hostPlatform.isStatic,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -24,9 +26,20 @@ stdenv.mkDerivation (finalAttrs: {
       url = "https://github.com/imageworks/pystring/commit/e5df7dd77f239889713ab54fa5f23504759e252f.patch";
       hash = "sha256-ergkJOPLbCCYdrx3KqW7BSpzGC4tRvgT7tYPySKTVE4=";
     })
+
+    # fix static + install header
+    # ref. https://github.com/imageworks/pystring/pull/43 merged upstream
+    (fetchpatch {
+      url = "https://github.com/imageworks/pystring/commit/4b8029a55c8a3e1839b1445606ec80f39995b09a.patch";
+      hash = "sha256-PDWAIfzSb9UeykrBwf940FBa5gdYnUDi9m8PIZpreKE=";
+    })
   ];
 
   nativeBuildInputs = [ cmake ];
+
+  cmakeFlags = [
+    (lib.cmakeBool "BUILD_SHARED_LIBS" (!static))
+  ];
 
   doCheck = true;
 
