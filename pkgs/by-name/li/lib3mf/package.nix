@@ -55,6 +55,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeFlags = [
     "-DCMAKE_INSTALL_INCLUDEDIR=include/lib3mf"
+    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
     "-DUSE_INCLUDED_ZLIB=OFF"
     "-DUSE_INCLUDED_LIBZIP=OFF"
     "-DUSE_INCLUDED_GTEST=OFF"
