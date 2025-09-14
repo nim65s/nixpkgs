@@ -52,6 +52,12 @@ buildPythonPackage rec {
     hash = "sha256-/nxJxZrTYX7F2grafIWwx9SyfR47ZXyaUwPHMEOdKkI=";
   };
 
+  patches = [
+    # fix tests
+    # ref https://github.com/imageio/imageio/pull/1144, merged upstream
+    ./1144.patch
+  ];
+
   postPatch = lib.optionalString (!stdenv.hostPlatform.isDarwin) ''
     substituteInPlace tests/test_core.py \
       --replace-fail 'ctypes.util.find_library("GL")' '"${libgl}"'

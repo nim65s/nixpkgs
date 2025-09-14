@@ -1,0 +1,713 @@
+From 35f798edad83fbdafb67bbda4032f41bec0b3d74 Mon Sep 17 00:00:00 2001
+From: Pandede <steven9609@gmail.com>
+Date: Thu, 28 Aug 2025 00:54:09 +0800
+Subject: [PATCH 1/5] fix `av_frame.time_base` cannot be null
+
+---
+ imageio/plugins/pyav.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/imageio/plugins/pyav.py b/imageio/plugins/pyav.py
+index 08dba156d..fdfeb7acc 100644
+--- a/imageio/plugins/pyav.py
++++ b/imageio/plugins/pyav.py
+@@ -961,7 +961,8 @@ def write_frame(self, frame: np.ndarray, *, pixel_format: str = "rgb24") -> None
+             plane_array[...] = frame
+ 
+         stream = self._video_stream
+-        av_frame.time_base = stream.codec_context.time_base
++        if stream.codec_context.time_base:
++            av_frame.time_base = stream.codec_context.time_base
+         av_frame.pts = self.frames_written
+         self.frames_written += 1
+ 
+
+From 63dfd1b284d92eec320328f3e8509605a8101813 Mon Sep 17 00:00:00 2001
+From: Sebastian Wallkotter <sebastian@wallkoetter.net>
+Date: Sun, 14 Sep 2025 08:19:34 +0200
+Subject: [PATCH 2/5] BUG: fix typo
+
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 69fe8a1df..c71709913 100644
+--- a/setup.py
++++ b/setup.py
+@@ -90,7 +90,7 @@
+     "dicom": [],
+     "feisem": [],
+     "ffmpeg": ["imageio-ffmpeg", "psutil"],
+-    "freeimage": [],
++    "freeimage": ["fsspec[http]"],
+     "lytro": [],
+     "numpy": [],
+     "pillow-heif": ["pillow-heif"],
+
+From 29233171f1d9322d45b85c786947fbee71497837 Mon Sep 17 00:00:00 2001
+From: Sebastian Wallkotter <sebastian@wallkoetter.net>
+Date: Sun, 14 Sep 2025 08:37:20 +0200
+Subject: [PATCH 3/5] stop using wikipedia example image
+
+Wikipedia has a policy against "bulk downloads" and is thus blocking the user agent "python" from downloading anything. This includes preventing us from downloading our example image to show reading from HTTP. I've changed it to use our own copy of that image living on GH instead.
+---
+ docs/examples.rst    | 2 +-
+ tests/test_pillow.py | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/docs/examples.rst b/docs/examples.rst
+index c26261975..54ecc79ae 100644
+--- a/docs/examples.rst
++++ b/docs/examples.rst
+@@ -45,7 +45,7 @@ Imageio can read from filenames, file objects.
+ 
+ 
+     # from HTTPS
+-    web_image = "https://upload.wikimedia.org/wikipedia/commons/d/d3/Newtons_cradle_animation_book_2.gif"
++    web_image = "https://raw.githubusercontent.com/imageio/test_images/refs/heads/main/newtonscradle.gif"
+     frames = iio.imread(web_image, index=None)
+ 
+     # from bytes
+diff --git a/tests/test_pillow.py b/tests/test_pillow.py
+index 6127078d5..26712f3af 100644
+--- a/tests/test_pillow.py
++++ b/tests/test_pillow.py
+@@ -364,11 +364,11 @@ def test_gif_list_write(test_images, tmp_path):
+ def test_gif_first_p_frame():
+     # Bugfix: https://github.com/imageio/imageio/issues/1030
+     im = iio.imread(
+-        "https://upload.wikimedia.org/wikipedia/commons/d/d3/Newtons_cradle_animation_book_2.gif",
++        "https://raw.githubusercontent.com/imageio/test_images/refs/heads/main/newtonscradle.gif",
+         plugin="pillow",
+         index=None,
+     )
+-    assert im.shape == (36, 360, 480, 3)
++    assert im.shape == (36, 150, 200, 3)
+ 
+ 
+ def test_legacy_exif_orientation(test_images, tmp_path):
+
+From cba765b00e58caf1cf2d59ae4144954d377ecefc Mon Sep 17 00:00:00 2001
+From: Sebastian Wallkotter <sebastian@wallkoetter.net>
+Date: Sun, 14 Sep 2025 08:45:12 +0200
+Subject: [PATCH 4/5] skip dash tests (for now)
+
+---
+ tests/test_pyav.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_pyav.py b/tests/test_pyav.py
+index 08f7c4d66..7ef25fddf 100644
+--- a/tests/test_pyav.py
++++ b/tests/test_pyav.py
+@@ -438,8 +438,8 @@ def test_sequential_reading(test_images):
+ 
+     assert np.allclose(actual_imgs, expected_imgs)
+ 
+-
+-def test_uri_reading(test_images):
++@pytest.mark.skip(reason="PyAV no longer supports DASH natively. This needs separate investigation.")
++def test_uri_reading(test_images):    
+     uri = "https://dash.akamaized.net/dash264/TestCases/2c/qualcomm/1/MultiResMPEG2.mpd"
+ 
+     with av.open(uri) as container:
+
+From a1f7de48cd5a67de2da98cab4ef8f3771a25cea8 Mon Sep 17 00:00:00 2001
+From: Sebastian Wallkotter <sebastian@wallkoetter.net>
+Date: Sun, 14 Sep 2025 08:51:16 +0200
+Subject: [PATCH 5/5] linting
+
+---
+ docs/imageio_ext.py               |  3 +--
+ imageio/core/__init__.py          |  2 +-
+ imageio/core/fetching.py          |  3 +--
+ imageio/core/findlib.py           |  3 +--
+ imageio/plugins/_dicom.py         |  3 +--
+ imageio/plugins/_freeimage.py     |  2 +-
+ imageio/plugins/bsdf.py           |  2 +-
+ imageio/plugins/example.py        |  3 +--
+ imageio/plugins/freeimagemulti.py |  3 +--
+ imageio/plugins/gdal.py           |  2 +-
+ imageio/plugins/lytro.py          | 14 +++++++-------
+ imageio/plugins/pillow.py         |  2 +-
+ imageio/plugins/pillow_legacy.py  |  2 +-
+ imageio/plugins/pillowmulti.py    |  6 +++---
+ imageio/plugins/rawpy.py          |  2 +-
+ imageio/plugins/simpleitk.py      |  2 +-
+ imageio/plugins/spe.py            |  2 +-
+ imageio/plugins/swf.py            |  2 +-
+ imageio/plugins/tifffile.py       |  2 +-
+ imageio/testing.py                |  3 +--
+ tests/test_bsdf.py                |  3 +--
+ tests/test_core.py                |  3 +--
+ tests/test_dicom.py               |  3 +--
+ tests/test_ffmpeg.py              |  4 +---
+ tests/test_ffmpeg_info.py         |  3 +--
+ tests/test_fits.py                |  3 +--
+ tests/test_freeimage.py           |  3 +--
+ tests/test_gdal.py                |  3 +--
+ tests/test_lytro.py               |  3 +--
+ tests/test_meta.py                |  3 +--
+ tests/test_npz.py                 |  3 +--
+ tests/test_pillow.py              |  3 +--
+ tests/test_pillow_legacy.py       |  3 +--
+ tests/test_pyav.py                |  7 +++++--
+ tests/test_rawpy.py               |  3 +--
+ tests/test_simpleitk.py           |  3 +--
+ tests/test_swf.py                 |  3 +--
+ tests/test_tifffile.py            |  3 +--
+ tests/test_tifffile_v3.py         |  3 +--
+ 39 files changed, 51 insertions(+), 74 deletions(-)
+
+diff --git a/docs/imageio_ext.py b/docs/imageio_ext.py
+index 777600d56..9f06bfa81 100644
+--- a/docs/imageio_ext.py
++++ b/docs/imageio_ext.py
+@@ -1,5 +1,4 @@
+-""" Invoke various functionality for imageio docs.
+-"""
++"""Invoke various functionality for imageio docs."""
+ 
+ from pathlib import Path
+ 
+diff --git a/imageio/core/__init__.py b/imageio/core/__init__.py
+index 80bedab11..d7ef5515c 100644
+--- a/imageio/core/__init__.py
++++ b/imageio/core/__init__.py
+@@ -1,7 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # Distributed under the (new) BSD License. See LICENSE.txt for more info.
+ 
+-""" This subpackage provides the core functionality of imageio
++"""This subpackage provides the core functionality of imageio
+ (everything but the plugins).
+ """
+ 
+diff --git a/imageio/core/fetching.py b/imageio/core/fetching.py
+index 0380bc793..9c5e5a5fb 100644
+--- a/imageio/core/fetching.py
++++ b/imageio/core/fetching.py
+@@ -2,8 +2,7 @@
+ # Based on code from the vispy project
+ # Distributed under the (new) BSD License. See LICENSE.txt for more info.
+ 
+-"""Data downloading and reading functions
+-"""
++"""Data downloading and reading functions"""
+ 
+ from math import log
+ import os
+diff --git a/imageio/core/findlib.py b/imageio/core/findlib.py
+index 76bda5216..f45fd5ab2 100644
+--- a/imageio/core/findlib.py
++++ b/imageio/core/findlib.py
+@@ -2,8 +2,7 @@
+ # Copyright (c) 2015-1018, imageio contributors
+ # Copyright (C) 2013, Zach Pincus, Almar Klein and others
+ 
+-""" This module contains generic code to find and load a dynamic library.
+-"""
++"""This module contains generic code to find and load a dynamic library."""
+ 
+ import os
+ import sys
+diff --git a/imageio/plugins/_dicom.py b/imageio/plugins/_dicom.py
+index 2f2f7ac51..183c9f7b4 100644
+--- a/imageio/plugins/_dicom.py
++++ b/imageio/plugins/_dicom.py
+@@ -1,8 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # imageio is distributed under the terms of the (new) BSD License.
+ 
+-""" Plugin for reading DICOM files.
+-"""
++"""Plugin for reading DICOM files."""
+ 
+ # todo: Use pydicom:
+ # * Note: is not py3k ready yet
+diff --git a/imageio/plugins/_freeimage.py b/imageio/plugins/_freeimage.py
+index 99f7cbb1b..3b4b88068 100644
+--- a/imageio/plugins/_freeimage.py
++++ b/imageio/plugins/_freeimage.py
+@@ -3,7 +3,7 @@
+ 
+ # styletest: ignore E261
+ 
+-""" Module imageio/freeimage.py
++"""Module imageio/freeimage.py
+ 
+ This module contains the wrapper code for the freeimage library.
+ The functions defined in this module are relatively thin; just thin
+diff --git a/imageio/plugins/bsdf.py b/imageio/plugins/bsdf.py
+index 041d7e524..609e12aae 100644
+--- a/imageio/plugins/bsdf.py
++++ b/imageio/plugins/bsdf.py
+@@ -1,7 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # imageio is distributed under the terms of the (new) BSD License.
+ 
+-""" Read/Write BSDF files.
++"""Read/Write BSDF files.
+ 
+ Backend Library: internal
+ 
+diff --git a/imageio/plugins/example.py b/imageio/plugins/example.py
+index b7cf8b9b3..a953bf145 100644
+--- a/imageio/plugins/example.py
++++ b/imageio/plugins/example.py
+@@ -1,8 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # imageio is distributed under the terms of the (new) BSD License.
+ 
+-""" Example plugin. You can use this as a template for your own plugin.
+-"""
++"""Example plugin. You can use this as a template for your own plugin."""
+ 
+ import numpy as np
+ 
+diff --git a/imageio/plugins/freeimagemulti.py b/imageio/plugins/freeimagemulti.py
+index bad53d40f..b9f2e6a30 100644
+--- a/imageio/plugins/freeimagemulti.py
++++ b/imageio/plugins/freeimagemulti.py
+@@ -1,8 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # imageio is distributed under the terms of the (new) BSD License.
+ 
+-"""Plugin for multi-image freeimafe formats, like animated GIF and ico.
+-"""
++"""Plugin for multi-image freeimafe formats, like animated GIF and ico."""
+ 
+ import logging
+ import numpy as np
+diff --git a/imageio/plugins/gdal.py b/imageio/plugins/gdal.py
+index 04cabb7e3..48cb7479f 100644
+--- a/imageio/plugins/gdal.py
++++ b/imageio/plugins/gdal.py
+@@ -1,7 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # imageio is distributed under the terms of the (new) BSD License.
+ 
+-""" Read GDAL files.
++"""Read GDAL files.
+ 
+ Backend: `GDAL <https://gdal.org/>`_
+ 
+diff --git a/imageio/plugins/lytro.py b/imageio/plugins/lytro.py
+index add38ad93..3d41a6d70 100644
+--- a/imageio/plugins/lytro.py
++++ b/imageio/plugins/lytro.py
+@@ -3,7 +3,7 @@
+ # imageio is distributed under the terms of the (new) BSD License.
+ #
+ 
+-""" Read LFR files (Lytro Illum).
++"""Read LFR files (Lytro Illum).
+ 
+ Backend: internal
+ 
+@@ -315,7 +315,7 @@ def _find_header(self):
+             """
+             Checks if file has correct header and skip it.
+             """
+-            file_header = b"\x89LFP\x0D\x0A\x1A\x0A\x00\x00\x00\x01"
++            file_header = b"\x89LFP\x0d\x0a\x1a\x0a\x00\x00\x00\x01"
+             # Read and check header of file
+             header = self._file.read(HEADER_LENGTH)
+             if header != file_header:
+@@ -328,7 +328,7 @@ def _find_chunks(self):
+             """
+             Gets start position and size of data chunks in file.
+             """
+-            chunk_header = b"\x89LFC\x0D\x0A\x1A\x0A\x00\x00\x00\x00"
++            chunk_header = b"\x89LFC\x0d\x0a\x1a\x0a\x00\x00\x00\x00"
+ 
+             for i in range(0, DATA_CHUNKS_ILLUM):
+                 data_pos, size, sha1 = self._get_chunk(chunk_header)
+@@ -339,7 +339,7 @@ def _find_meta(self):
+             Gets a data chunk that contains information over content
+             of other data chunks.
+             """
+-            meta_header = b"\x89LFM\x0D\x0A\x1A\x0A\x00\x00\x00\x00"
++            meta_header = b"\x89LFM\x0d\x0a\x1a\x0a\x00\x00\x00\x00"
+             data_pos, size, sha1 = self._get_chunk(meta_header)
+ 
+             # Get content
+@@ -607,7 +607,7 @@ def _find_header(self):
+             """
+             Checks if file has correct header and skip it.
+             """
+-            file_header = b"\x89LFP\x0D\x0A\x1A\x0A\x00\x00\x00\x01"
++            file_header = b"\x89LFP\x0d\x0a\x1a\x0a\x00\x00\x00\x01"
+ 
+             # Read and check header of file
+             header = self._file.read(HEADER_LENGTH)
+@@ -621,7 +621,7 @@ def _find_chunks(self):
+             """
+             Gets start position and size of data chunks in file.
+             """
+-            chunk_header = b"\x89LFC\x0D\x0A\x1A\x0A\x00\x00\x00\x00"
++            chunk_header = b"\x89LFC\x0d\x0a\x1a\x0a\x00\x00\x00\x00"
+ 
+             for i in range(0, DATA_CHUNKS_F01):
+                 data_pos, size, sha1 = self._get_chunk(chunk_header)
+@@ -632,7 +632,7 @@ def _find_meta(self):
+             Gets a data chunk that contains information over content
+             of other data chunks.
+             """
+-            meta_header = b"\x89LFM\x0D\x0A\x1A\x0A\x00\x00\x00\x00"
++            meta_header = b"\x89LFM\x0d\x0a\x1a\x0a\x00\x00\x00\x00"
+ 
+             data_pos, size, sha1 = self._get_chunk(meta_header)
+ 
+diff --git a/imageio/plugins/pillow.py b/imageio/plugins/pillow.py
+index 8826f35cc..fbda7221c 100644
+--- a/imageio/plugins/pillow.py
++++ b/imageio/plugins/pillow.py
+@@ -1,7 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # imageio is distributed under the terms of the (new) BSD License.
+ 
+-""" Read/Write images using Pillow/PIL.
++"""Read/Write images using Pillow/PIL.
+ 
+ Backend Library: `Pillow <https://pillow.readthedocs.io/en/stable/>`_
+ 
+diff --git a/imageio/plugins/pillow_legacy.py b/imageio/plugins/pillow_legacy.py
+index 75637ba51..9007c87b4 100644
+--- a/imageio/plugins/pillow_legacy.py
++++ b/imageio/plugins/pillow_legacy.py
+@@ -1,7 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # imageio is distributed under the terms of the (new) BSD License.
+ 
+-""" Read/Write images using pillow/PIL (legacy).
++"""Read/Write images using pillow/PIL (legacy).
+ 
+ Backend Library: `Pillow <https://pillow.readthedocs.io/en/stable/>`_
+ 
+diff --git a/imageio/plugins/pillowmulti.py b/imageio/plugins/pillowmulti.py
+index e41c71073..e75a18ead 100644
+--- a/imageio/plugins/pillowmulti.py
++++ b/imageio/plugins/pillowmulti.py
+@@ -220,7 +220,7 @@ def getImageDescriptor(self, im, xy=None):
+             xy = (0, 0)
+ 
+         # Image separator,
+-        bb = b"\x2C"
++        bb = b"\x2c"
+ 
+         # Image position and size
+         bb += intToBin(xy[0])  # Left position
+@@ -245,7 +245,7 @@ def getAppExt(self, loop):
+             loop = 2**16 - 1
+         bb = b""
+         if loop != 0:  # omit the extension if we would like a nonlooping gif
+-            bb = b"\x21\xFF\x0B"  # application extension
++            bb = b"\x21\xff\x0b"  # application extension
+             bb += b"NETSCAPE2.0"
+             bb += b"\x03\x01"
+             bb += intToBin(loop)
+@@ -268,7 +268,7 @@ def getGraphicsControlExt(self, duration=0.1, dispose=2):
+           * 4-7 -To be defined.
+         """
+ 
+-        bb = b"\x21\xF9\x04"
++        bb = b"\x21\xf9\x04"
+         bb += chr((dispose & 3) << 2).encode("utf-8")
+         # low bit 1 == transparency,
+         # 2nd bit 1 == user input , next 3 bits, the low two of which are used,
+diff --git a/imageio/plugins/rawpy.py b/imageio/plugins/rawpy.py
+index bde908f20..220ca937f 100644
+--- a/imageio/plugins/rawpy.py
++++ b/imageio/plugins/rawpy.py
+@@ -1,4 +1,4 @@
+-""" Read/Write images using rawpy.
++"""Read/Write images using rawpy.
+ 
+ rawpy is an easy-to-use Python wrapper for the LibRaw library.
+ It also contains some extra functionality for finding and repairing hot/dead pixels.
+diff --git a/imageio/plugins/simpleitk.py b/imageio/plugins/simpleitk.py
+index dfaa066c1..e1580c076 100644
+--- a/imageio/plugins/simpleitk.py
++++ b/imageio/plugins/simpleitk.py
+@@ -1,7 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # imageio is distributed under the terms of the (new) BSD License.
+ 
+-""" Read/Write images using SimpleITK.
++"""Read/Write images using SimpleITK.
+ 
+ Backend: `Insight Toolkit <https://itk.org/>`_
+ 
+diff --git a/imageio/plugins/spe.py b/imageio/plugins/spe.py
+index f56dd52eb..da743d4a6 100644
+--- a/imageio/plugins/spe.py
++++ b/imageio/plugins/spe.py
+@@ -1,7 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # imageio is distributed under the terms of the (new) BSD License.
+ 
+-""" Read SPE files.
++"""Read SPE files.
+ 
+ This plugin supports reading files saved in the Princeton Instruments
+ SPE file format.
+diff --git a/imageio/plugins/swf.py b/imageio/plugins/swf.py
+index 9d507ddee..4e9454606 100644
+--- a/imageio/plugins/swf.py
++++ b/imageio/plugins/swf.py
+@@ -1,7 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # imageio is distributed under the terms of the (new) BSD License.
+ 
+-""" Read/Write SWF files.
++"""Read/Write SWF files.
+ 
+ Backend: internal
+ 
+diff --git a/imageio/plugins/tifffile.py b/imageio/plugins/tifffile.py
+index 190cfe265..23d516c39 100644
+--- a/imageio/plugins/tifffile.py
++++ b/imageio/plugins/tifffile.py
+@@ -1,7 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # imageio is distributed under the terms of the (new) BSD License.
+ 
+-""" Read/Write TIFF files.
++"""Read/Write TIFF files.
+ 
+ Backend: internal
+ 
+diff --git a/imageio/testing.py b/imageio/testing.py
+index 535b1386d..6746af847 100644
+--- a/imageio/testing.py
++++ b/imageio/testing.py
+@@ -1,8 +1,7 @@
+ # -*- coding: utf-8 -*-
+ # Distributed under the (new) BSD License. See LICENSE.txt for more info.
+ 
+-""" Functionality used for testing. This code itself is not covered in tests.
+-"""
++"""Functionality used for testing. This code itself is not covered in tests."""
+ 
+ import os
+ import sys
+diff --git a/tests/test_bsdf.py b/tests/test_bsdf.py
+index 6ef5d06bd..805c0bb49 100644
+--- a/tests/test_bsdf.py
++++ b/tests/test_bsdf.py
+@@ -1,5 +1,4 @@
+-""" Test BSDF plugin.
+-"""
++"""Test BSDF plugin."""
+ 
+ import numpy as np
+ 
+diff --git a/tests/test_core.py b/tests/test_core.py
+index ff35fb7ed..03ca85e77 100644
+--- a/tests/test_core.py
++++ b/tests/test_core.py
+@@ -1,5 +1,4 @@
+-""" Test imageio core functionality.
+-"""
++"""Test imageio core functionality."""
+ 
+ import os
+ import sys
+diff --git a/tests/test_dicom.py b/tests/test_dicom.py
+index 427a5371f..c9dff4ba3 100644
+--- a/tests/test_dicom.py
++++ b/tests/test_dicom.py
+@@ -1,5 +1,4 @@
+-""" Test DICOM functionality.
+-"""
++"""Test DICOM functionality."""
+ 
+ from zipfile import ZipFile
+ 
+diff --git a/tests/test_ffmpeg.py b/tests/test_ffmpeg.py
+index c148dac50..fd28a9ae1 100644
+--- a/tests/test_ffmpeg.py
++++ b/tests/test_ffmpeg.py
+@@ -1,6 +1,4 @@
+-""" Test ffmpeg
+-
+-"""
++"""Test ffmpeg"""
+ 
+ import gc
+ import os
+diff --git a/tests/test_ffmpeg_info.py b/tests/test_ffmpeg_info.py
+index 87e787fc5..e75cf42f7 100644
+--- a/tests/test_ffmpeg_info.py
++++ b/tests/test_ffmpeg_info.py
+@@ -1,6 +1,5 @@
+ # styletest: ignore E501
+-""" Tests specific to parsing ffmpeg info.
+-"""
++"""Tests specific to parsing ffmpeg info."""
+ 
+ import pytest
+ import imageio
+diff --git a/tests/test_fits.py b/tests/test_fits.py
+index f96d1aa5c..4c28541ad 100644
+--- a/tests/test_fits.py
++++ b/tests/test_fits.py
+@@ -1,5 +1,4 @@
+-""" Test fits plugin functionality.
+-"""
++"""Test fits plugin functionality."""
+ 
+ import pytest
+ 
+diff --git a/tests/test_freeimage.py b/tests/test_freeimage.py
+index 104009526..b3a56dfe9 100644
+--- a/tests/test_freeimage.py
++++ b/tests/test_freeimage.py
+@@ -1,5 +1,4 @@
+-""" Tests for imageio's freeimage plugin
+-"""
++"""Tests for imageio's freeimage plugin"""
+ 
+ import os
+ import shutil
+diff --git a/tests/test_gdal.py b/tests/test_gdal.py
+index 85ec47101..301f90bd8 100644
+--- a/tests/test_gdal.py
++++ b/tests/test_gdal.py
+@@ -1,5 +1,4 @@
+-""" Test gdal plugin functionality.
+-"""
++"""Test gdal plugin functionality."""
+ 
+ import pytest
+ import imageio
+diff --git a/tests/test_lytro.py b/tests/test_lytro.py
+index 303938809..079b1cfca 100644
+--- a/tests/test_lytro.py
++++ b/tests/test_lytro.py
+@@ -1,5 +1,4 @@
+-""" Test npz plugin functionality.
+-"""
++"""Test npz plugin functionality."""
+ 
+ from __future__ import division
+ import numpy as np
+diff --git a/tests/test_meta.py b/tests/test_meta.py
+index f9d751f0f..0cc499638 100644
+--- a/tests/test_meta.py
++++ b/tests/test_meta.py
+@@ -1,5 +1,4 @@
+-""" Test imageio meta stuff, like namespaces and spuriuos imports
+-"""
++"""Test imageio meta stuff, like namespaces and spuriuos imports"""
+ 
+ from __future__ import print_function
+ 
+diff --git a/tests/test_npz.py b/tests/test_npz.py
+index 43bddd074..90d7dc450 100644
+--- a/tests/test_npz.py
++++ b/tests/test_npz.py
+@@ -1,5 +1,4 @@
+-""" Test npz plugin functionality.
+-"""
++"""Test npz plugin functionality."""
+ 
+ import pytest
+ 
+diff --git a/tests/test_pillow.py b/tests/test_pillow.py
+index 26712f3af..9b52d7e11 100644
+--- a/tests/test_pillow.py
++++ b/tests/test_pillow.py
+@@ -1,5 +1,4 @@
+-""" Tests for imageio's pillow plugin
+-"""
++"""Tests for imageio's pillow plugin"""
+ 
+ import io
+ import os
+diff --git a/tests/test_pillow_legacy.py b/tests/test_pillow_legacy.py
+index c804e9d9c..8a9d0570f 100644
+--- a/tests/test_pillow_legacy.py
++++ b/tests/test_pillow_legacy.py
+@@ -1,5 +1,4 @@
+-""" Tests for imageio's pillow plugin
+-"""
++"""Tests for imageio's pillow plugin"""
+ 
+ import os
+ import sys
+diff --git a/tests/test_pyav.py b/tests/test_pyav.py
+index 7ef25fddf..a8d2c442c 100644
+--- a/tests/test_pyav.py
++++ b/tests/test_pyav.py
+@@ -438,8 +438,11 @@ def test_sequential_reading(test_images):
+ 
+     assert np.allclose(actual_imgs, expected_imgs)
+ 
+-@pytest.mark.skip(reason="PyAV no longer supports DASH natively. This needs separate investigation.")
+-def test_uri_reading(test_images):    
++
++@pytest.mark.skip(
++    reason="PyAV no longer supports DASH natively. This needs separate investigation."
++)
++def test_uri_reading(test_images):
+     uri = "https://dash.akamaized.net/dash264/TestCases/2c/qualcomm/1/MultiResMPEG2.mpd"
+ 
+     with av.open(uri) as container:
+diff --git a/tests/test_rawpy.py b/tests/test_rawpy.py
+index 9480fcf55..56ef98eeb 100644
+--- a/tests/test_rawpy.py
++++ b/tests/test_rawpy.py
+@@ -1,5 +1,4 @@
+-"""Tests for rawpy plugin
+-"""
++"""Tests for rawpy plugin"""
+ 
+ import imageio.v3 as iio
+ 
+diff --git a/tests/test_simpleitk.py b/tests/test_simpleitk.py
+index e69ef9ced..979f37c17 100644
+--- a/tests/test_simpleitk.py
++++ b/tests/test_simpleitk.py
+@@ -1,5 +1,4 @@
+-""" Test simpleitk plugin functionality.
+-"""
++"""Test simpleitk plugin functionality."""
+ 
+ import numpy as np
+ 
+diff --git a/tests/test_swf.py b/tests/test_swf.py
+index 1f3996dca..bdf1bb652 100644
+--- a/tests/test_swf.py
++++ b/tests/test_swf.py
+@@ -1,5 +1,4 @@
+-""" Tests for the shockwave flash plugin
+-"""
++"""Tests for the shockwave flash plugin"""
+ 
+ import numpy as np
+ 
+diff --git a/tests/test_tifffile.py b/tests/test_tifffile.py
+index 7ac0d4be4..f2f5a6d7c 100644
+--- a/tests/test_tifffile.py
++++ b/tests/test_tifffile.py
+@@ -1,5 +1,4 @@
+-""" Test tifffile plugin functionality.
+-"""
++"""Test tifffile plugin functionality."""
+ 
+ import datetime
+ import io
+diff --git a/tests/test_tifffile_v3.py b/tests/test_tifffile_v3.py
+index a130408b6..66f665bd3 100644
+--- a/tests/test_tifffile_v3.py
++++ b/tests/test_tifffile_v3.py
+@@ -1,5 +1,4 @@
+-""" Test tifffile plugin functionality.
+-"""
++"""Test tifffile plugin functionality."""
+ 
+ import datetime
+ import numpy as np
