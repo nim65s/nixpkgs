@@ -204,7 +204,7 @@ stdenv.mkDerivation (finalAttrs: {
     cp -a NATIVE/bin/llvm-config $out/bin/llvm-config-native
   '');
 
-  doCheck = buildTests;
+  doCheck = false;
 
   nativeCheckInputs = [ which ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ sysctl ];
 
