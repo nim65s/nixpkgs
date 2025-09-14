@@ -3,8 +3,7 @@
   buildPythonPackage,
   cmake,
   cvxopt,
-  fetchPypi,
-  future,
+  fetchFromGitHub,
   numpy,
   oldest-supported-numpy,
   pytestCheckHook,
@@ -16,20 +15,17 @@
 
 buildPythonPackage rec {
   pname = "osqp";
-  version = "0.6.7.post3";
+  version = "1.0.4";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
 
-  src = fetchPypi {
-    inherit pname version;
-    hash = "sha256-sMXgpyHyHJckCXpP1QEIME0pZGjRJOFvNKxnBG9wIOE=";
+  src = fetchFromGitHub {
+    owner = "osqp";
+    repo = "osqp-python";
+    tag = "v${version}";
+    hash = "sha256-i39tphtGO//MS5sqwn6qx5ORR/A8moi0O8ltGGmkv2w=";
   };
-
-  postPatch = ''
-    substituteInPlace pyproject.toml \
-      --replace-fail "numpy >= 2.0.0" numpy
-  '';
 
   dontUseCmakeConfigure = true;
 
@@ -60,17 +56,9 @@ buildPythonPackage rec {
   disabledTests = [
     # Need an unfree license package - mkl
     "test_issue14"
-  ]
-  # disable tests failing after scipy 1.12 update
-  # https://github.com/osqp/osqp-python/issues/121
-  # re-enable once unit tests fixed
-  ++ [
-    "feasibility_tests"
-    "polish_tests"
-    "update_matrices_tests"
   ];
 
-  meta = with lib; {
+  meta = {
     description = "Operator Splitting QP Solver";
     longDescription = ''
       Numerical optimization package for solving problems in the form
@@ -81,7 +69,7 @@ buildPythonPackage rec {
     '';
     homepage = "https://osqp.org/";
     downloadPage = "https://github.com/oxfordcontrol/osqp-python/releases";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ drewrisinger ];
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ drewrisinger ];
   };
 }
