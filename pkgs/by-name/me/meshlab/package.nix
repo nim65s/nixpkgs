@@ -113,7 +113,7 @@ stdenv.mkDerivation rec {
     mainProgram = "meshlab";
     homepage = "https://www.meshlab.net/";
     license = lib.licenses.gpl3Only;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ nim65s ];
     platforms = with lib.platforms; linux;
   };
 }
