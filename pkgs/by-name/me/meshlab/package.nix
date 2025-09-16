@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchpatch,
   libsForQt5,
   libGLU,
   lib3ds,
@@ -24,6 +25,7 @@
   corto,
   openctm,
   structuresynth,
+  breakpointHook,
 }:
 
 let
@@ -36,13 +38,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "meshlab";
-  version = "2023.12";
+  version = "2025.07";
 
   src = fetchFromGitHub {
     owner = "cnr-isti-vclab";
     repo = "meshlab";
     rev = "MeshLab-${finalAttrs.version}";
-    sha256 = "sha256-AdUAWS741RQclYaSE3Tz1/I0YSinNAnfSaqef+Tib8Y=";
+    hash = "sha256-6BozYzPCbBZ+btL4FCdzKlwKqTsvFWDfOXizzJSYo9s=";
   };
 
   buildInputs = [
@@ -72,12 +74,33 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   nativeBuildInputs = [
+    # breakpointHook
     cmake
     libsForQt5.wrapQtAppsHook
   ];
 
+  patches = [
+    # Allow use of system levmar
+    (fetchpatch {
+      url = "https://github.com/nim65s/meshlab/commit/ce1e2d3eb2dcf2dd9daec79ced7d918c8aed08c5.patch";
+      hash = "sha256-oat1vN3ObNXl7xEOYtgEvIO3drFtp1T/UbPcrAJhoxY=";
+    })
+    # Allow use of system lib3mf
+    (fetchpatch {
+      url = "https://github.com/nim65s/meshlab/commit/393df66ed5334983379ddbedcaee5bfc57daf0f8.patch";
+      hash = "sha256-vzhBhFbE5h1OfCW/3ZDSBnyFVfgvd3NbJ9+v52M/h5o=";
+    })
+    # Allow use of system libigl
+    (fetchpatch {
+      url = "https://github.com/nim65s/meshlab/commit/80ad48ffb.patch";
+      hash = "sha256-StBjRDFdPvI5cXL4wKaGQAFnKzHjdPb9RS3WbkAni60=";
+    })
+  ];
+
   preConfigure = ''
     substituteAll ${./meshlab.desktop} resources/linux/meshlab.desktop
+  ''
+  + lib.optionalString false ''
     substituteInPlace src/external/tinygltf.cmake \
       --replace-fail '$'{MESHLAB_EXTERNAL_DOWNLOAD_DIR}/tinygltf-2.6.3 ${tinygltf-src}
     substituteInPlace src/external/libigl.cmake \
@@ -95,7 +118,16 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   cmakeFlags = [
-    "-DVCGDIR=${vcg.src}"
+    (lib.cmakeFeature "VCGDIR" "${vcg.src}")
+    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_BOOST" false)
+    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_CGAL" false)
+    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_EMBREE" false)
+    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_LEVMAR" false)
+    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_LIB3DS" false)
+    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_LIB3MF" false)
+    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_LIBIGL" false)
+    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_MUPARSER" false)
+    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_NEXUS" false)
   ];
 
   postFixup = ''
