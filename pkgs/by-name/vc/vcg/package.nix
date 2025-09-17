@@ -3,6 +3,10 @@
 
   stdenv,
   fetchFromGitHub,
+  fetchpatch,
+
+  # nativeBuildInputs
+  cmake,
 
   # propagatedBuildInputs
   eigen,
@@ -19,13 +23,22 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-OZnqFnHGXC9fS7JCLTiHNCeA//JBAZGLB5SP/rGzaA8=";
   };
 
+  patches = [
+    (fetchpatch {
+      url = "https://github.com/nim65s/vcglib/commit/3350032c99bbf7c0bc966ba90b39f1129317c37a.patch";
+      hash = "sha256-F5RMIIhAQDqfE9gosqR+Z98ujGHAz/WpOfoGvgdIEb4=";
+    })
+  ];
+
+  nativeBuildInputs = [
+    cmake
+  ];
+
   propagatedBuildInputs = [ eigen ];
 
-  installPhase = ''
-    mkdir -p $out/include
-    cp -r vcg wrap $out/include
-    find $out -name \*.h -exec sed -i 's,<eigenlib/,<eigen3/,g' {} \;
-  '';
+  cmakeFlags = [
+    (lib.cmakeBool "VCG_ALLOW_BUNDLED_EIGEN" false)
+  ];
 
   meta = {
     homepage = "https://vcg.isti.cnr.it/vcglib/install.html";
