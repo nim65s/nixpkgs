@@ -24,9 +24,10 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   patches = [
+    # Fix CMake packaging
     (fetchpatch {
-      url = "https://github.com/nim65s/vcglib/commit/3350032c99bbf7c0bc966ba90b39f1129317c37a.patch";
-      hash = "sha256-F5RMIIhAQDqfE9gosqR+Z98ujGHAz/WpOfoGvgdIEb4=";
+      url = "https://github.com/nim65s/vcglib/commit/82c5c93c.patch";
+      hash = "sha256-Q9oTPZ2PHBQf8W5KxC9wzCKAkQCswN2kNCxSL5eLmSQ=";
     })
   ];
 
