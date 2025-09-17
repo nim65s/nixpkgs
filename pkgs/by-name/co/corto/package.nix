@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchpatch,
   cmake,
   nix-update-script,
 }:
@@ -17,6 +18,13 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-wfIZQdypBTfUZJgPE4DetSt1SUNSyZihmL1Uzapqh1o=";
   };
 
+  patches = [
+    (fetchpatch {
+      url = "https://github.com/cnr-isti-vclab/corto/commit/169356e.patch";
+      hash = "sha256-imJfQ8JEhCcSkkO35N7Z3NtGElCyVxENPMDMWfNqdW0=";
+    })
+  ];
+
   nativeBuildInputs = [ cmake ];
 
   updateScript = nix-update-script { };
@@ -26,5 +34,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/cnr-isti-vclab/corto";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ nim65s ];
+    mainProgram = "corto";
   };
 })
