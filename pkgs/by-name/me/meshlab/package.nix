@@ -26,7 +26,6 @@
   corto,
   openctm,
   structuresynth,
-  breakpointHook,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -68,10 +67,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   nativeBuildInputs = [
-    # breakpointHook
     cmake
     libsForQt5.wrapQtAppsHook
-    breakpointHook
   ];
 
   patches = [
@@ -98,15 +95,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeFlags = [
     (lib.cmakeFeature "VCGDIR" "${vcg.src}")
-    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_BOOST" false)
-    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_CGAL" false)
-    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_EMBREE" false)
-    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_LEVMAR" false)
-    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_LIB3DS" false)
-    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_LIB3MF" false)
-    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_LIBIGL" false)
-    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_MUPARSER" false)
-    (lib.cmakeBool "MESHLAB_ALLOW_DOWNLOAD_SOURCE_NEXUS" false)
   ];
 
   postFixup = ''
