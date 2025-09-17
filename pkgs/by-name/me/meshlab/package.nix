@@ -6,6 +6,7 @@
   libsForQt5,
   libGLU,
   lib3ds,
+  lib3mf,
   bzip2,
   muparser,
   eigen,
@@ -28,14 +29,6 @@
   breakpointHook,
 }:
 
-let
-  tinygltf-src = fetchFromGitHub {
-    owner = "syoyo";
-    repo = "tinygltf";
-    rev = "v2.6.3";
-    hash = "sha256-IyezvHzgLRyc3z8HdNsQMqDEhP+Ytw0stFNak3C8lTo=";
-  };
-in
 stdenv.mkDerivation (finalAttrs: {
   pname = "meshlab";
   version = "2025.07";
@@ -53,6 +46,7 @@ stdenv.mkDerivation (finalAttrs: {
     libsForQt5.qtscript
     libsForQt5.qtxmlpatterns
     lib3ds
+    lib3mf
     bzip2
     muparser
     eigen
@@ -77,6 +71,7 @@ stdenv.mkDerivation (finalAttrs: {
     # breakpointHook
     cmake
     libsForQt5.wrapQtAppsHook
+    breakpointHook
   ];
 
   patches = [
@@ -99,22 +94,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   preConfigure = ''
     substituteAll ${./meshlab.desktop} resources/linux/meshlab.desktop
-  ''
-  + lib.optionalString false ''
-    substituteInPlace src/external/tinygltf.cmake \
-      --replace-fail '$'{MESHLAB_EXTERNAL_DOWNLOAD_DIR}/tinygltf-2.6.3 ${tinygltf-src}
-    substituteInPlace src/external/libigl.cmake \
-      --replace-fail '$'{MESHLAB_EXTERNAL_DOWNLOAD_DIR}/libigl-2.4.0 ${libigl}
-    substituteInPlace src/external/nexus.cmake \
-      --replace-fail '$'{NEXUS_DIR}/src/corto ${corto.src}
-    substituteInPlace src/external/levmar.cmake \
-      --replace-fail '$'{LEVMAR_LINK} ${levmar.src} \
-      --replace-warn "MD5 ''${LEVMAR_MD5}" ""
-    substituteInPlace src/external/ssynth.cmake \
-      --replace-fail '$'{SSYNTH_LINK} ${structuresynth.src} \
-      --replace-warn "MD5 ''${SSYNTH_MD5}" ""
-    substituteInPlace src/common_gui/CMakeLists.txt \
-      --replace-warn "MESHLAB_LIB_INSTALL_DIR" "CMAKE_INSTALL_LIBDIR"
   '';
 
   cmakeFlags = [
