@@ -1,8 +1,15 @@
 {
   lib,
+
   stdenv,
   fetchFromGitHub,
+
+  # nativeBuildInputs
   cmake,
+  libsForQt5,
+
+  # buildInputs
+  vcg,
 }:
 
 stdenv.mkDerivation rec {
@@ -18,14 +25,20 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     cmake
+    libsForQt5.wrapQtAppsHook
+  ];
+
+  buildInputs = [
+    libsForQt5.qtbase
+    vcg
   ];
 
   meta = {
-    description = "Nexus is a c++/javascript library for creation and visualization of a batched multiresolution mesh";
+    description = "Library for creation and visualization of a batched multiresolution mesh";
     homepage = "https://github.com/cnr-isti-vclab/nexus";
-    license = lib.licenses.unfree; # FIXME: nix-init did not find a license
+    license = lib.licenses.gpl2;
     maintainers = with lib.maintainers; [ nim65s ];
-    mainProgram = "vclab-nexus";
-    platforms = lib.platforms.all;
+    mainProgram = "nxsview";
+    platforms = lib.platforms.unix ++ lib.platforms.windows;
   };
 }
