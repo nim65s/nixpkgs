@@ -29,6 +29,7 @@ stdenv.mkDerivation rec {
     description = "ANSI C implementations of Levenberg-Marquardt, usable also from C++";
     homepage = "https://www.ics.forth.gr/~lourakis/levmar/";
     license = lib.licenses.gpl2Plus;
+    maintainers = [ lib.maintainrs.nim65s ];
     platforms = lib.platforms.all;
   };
 }
