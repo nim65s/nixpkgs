@@ -26,10 +26,13 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-lC3nKQJwkixwGzPP/oS0J+WIFgYqky6NaXu9bX28+3I=";
   };
 
+  outputs = [ "out" "bin" ];
+
   patches = [
+    # Fix CMake packaging
     (fetchpatch {
-      url = "https://github.com/nim65s/nexus/commit/e742f16.patch";
-      hash = "sha256-zoJuLp11DNpacIWTSCQst0NDGM9rJ2xeLLX2NaSLm7I=";
+      url = "https://github.com/nim65s/nexus/commit/141ba17.patch";
+      hash = "sha256-iY84QIpliC1BIImI/6S6E6fQwMKPmmTiwouCXW6wLuM=";
     })
   ];
 
