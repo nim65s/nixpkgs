@@ -26,8 +26,8 @@ stdenv.mkDerivation (finalAttrs: {
   patches = [
     # Fix CMake packaging
     (fetchpatch {
-      url = "https://github.com/nim65s/vcglib/commit/12b4d240.patch";
-      hash = "sha256-FQQg4pDwaFXXr4cAhW/oexqhMDbKTwYhwBrowQ4/6cY=";
+      url = "https://github.com/nim65s/vcglib/commit/028e2bce71ca5bb820efa8e80c49fc24375524a2.patch";
+      hash = "sha256-U29xbmUyKm+XOeQpAPSEiVIxRup+POI5u5oKd7RgHoM=";
     })
   ];
 
@@ -35,10 +35,13 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
   ];
 
-  propagatedBuildInputs = [ eigen ];
+  propagatedBuildInputs = [
+    eigen
+  ];
 
   cmakeFlags = [
     (lib.cmakeBool "VCG_ALLOW_BUNDLED_EIGEN" false)
+    (lib.cmakeBool "VCG_BUILD_EXAMPLES" false)
   ];
 
   meta = {
