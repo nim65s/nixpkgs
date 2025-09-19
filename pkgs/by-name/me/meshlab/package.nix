@@ -26,6 +26,7 @@
   corto,
   openctm,
   structuresynth,
+  vclab-nexus,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -64,6 +65,7 @@ stdenv.mkDerivation (finalAttrs: {
     corto
     openctm
     structuresynth
+    vclab-nexus
   ];
 
   nativeBuildInputs = [
@@ -73,32 +75,18 @@ stdenv.mkDerivation (finalAttrs: {
 
   patches = [
     # Allow use of system levmar
-    (fetchpatch {
-      url = "https://github.com/nim65s/meshlab/commit/ce1e2d3eb2dcf2dd9daec79ced7d918c8aed08c5.patch";
-      hash = "sha256-oat1vN3ObNXl7xEOYtgEvIO3drFtp1T/UbPcrAJhoxY=";
-    })
-    # Allow use of system lib3mf
-    (fetchpatch {
-      url = "https://github.com/nim65s/meshlab/commit/393df66ed5334983379ddbedcaee5bfc57daf0f8.patch";
-      hash = "sha256-vzhBhFbE5h1OfCW/3ZDSBnyFVfgvd3NbJ9+v52M/h5o=";
-    })
-    # Allow use of system libigl
-    (fetchpatch {
-      url = "https://github.com/nim65s/meshlab/commit/80ad48ffb.patch";
-      hash = "sha256-StBjRDFdPvI5cXL4wKaGQAFnKzHjdPb9RS3WbkAni60=";
-    })
+    ./cmake.patch
   ];
 
   preConfigure = ''
     substituteAll ${./meshlab.desktop} resources/linux/meshlab.desktop
   '';
 
-  cmakeFlags = [
-    (lib.cmakeFeature "VCGDIR" "${vcg.src}")
-  ];
-
   postFixup = ''
-    patchelf --add-needed $out/lib/meshlab/libmeshlab-common.so $out/bin/.meshlab-wrapped
+    patchelf \
+      --add-needed $out/lib/meshlab/libmeshlab-common.so \
+      --add-needed $out/lib/meshlab/libmeshlab-common-gui.so \
+      $out/bin/.meshlab-wrapped
   '';
 
   # display a black screen on wayland, so force XWayland for now.
