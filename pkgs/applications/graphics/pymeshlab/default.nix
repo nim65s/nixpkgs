@@ -23,6 +23,11 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-LCR2/AyX9uVX4xhZareUL6YlpUsCFiGDMBB5nFp+H6k=";
   };
 
+  patches = [
+    # CMake: Allow use of our meshlab
+    ./cmake.patch
+  ];
+
   nativeBuildInputs = [
     cmake
     python3Packages.pybind11
