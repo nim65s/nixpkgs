@@ -1,31 +1,27 @@
-From 8f484bcf06b81e20e63153b6d5f44fde4de4e650 Mon Sep 17 00:00:00 2001
+From 7757ca4c59501df047e6db4322c5b1423a795039 Mon Sep 17 00:00:00 2001
 From: Guilhem Saurel <guilhem.saurel@laas.fr>
 Date: Fri, 19 Sep 2025 12:41:39 +0200
 Subject: [PATCH] CMake: allow use of system-provided meshlab & pybind11
 
 ---
- src/CMakeLists.txt           | 251 ++++++++++++++++++-----------------
- src/pymeshlab/CMakeLists.txt |  24 +++-
- 2 files changed, 144 insertions(+), 131 deletions(-)
+ src/CMakeLists.txt           | 259 ++++++++++++++++++-----------------
+ src/pymeshlab/CMakeLists.txt |  20 ++-
+ 2 files changed, 146 insertions(+), 133 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 8f9d5d8..b602150 100644
+index 8f9d5d8..f7d50b4 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -2,145 +2,148 @@ cmake_minimum_required(VERSION 3.18)
+@@ -1,146 +1,149 @@
+ cmake_minimum_required(VERSION 3.18)
  project(PyMeshLab)
  
- # MeshLab directory
+-# MeshLab directory
 -set(MESHLAB_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/meshlab/src")
-+find_package(meshlab CONFIG)
-+if(NOT TARGET meshlab::meshlab-common)
-+	set(MESHLAB_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/meshlab/src")
- 
+-
 -# general meshlab build settings that apply also in pymeshlab:
 -include("${MESHLAB_SRC_DIR}/cmake/meshlab_global_settings.cmake")
-+	# general meshlab build settings that apply also in pymeshlab:
-+	include("${MESHLAB_SRC_DIR}/cmake/meshlab_global_settings.cmake")
- 
+-
 -## Required libraries:
 -# - OpenGL (ToDo: remove this)
 -# - Qt5 - OpenGL, Xml
@@ -33,6 +29,37 @@ index 8f9d5d8..b602150 100644
 -# - Eigen3 (with fallback)
 -# - OpenMP (not required)
 -# - Python
+-
+-find_package(OpenGL REQUIRED)
+-find_package(
+-	Qt5
+-	COMPONENTS OpenGL Xml Network
+-	REQUIRED)
+-
+-message(STATUS "Searching for required components with bundled fallback")
+-
+-find_package(GLEW)
+-find_package(Eigen3 QUIET)
+-find_package(OpenMP)
+-
+-### Build settings
+ set(PYMESHLAB_BUILD_DISTRIB_DIR ${CMAKE_CURRENT_BINARY_DIR}/distrib/pymeshlab)
+ 
+-list(APPEND CMAKE_MODULE_PATH "${MESHLAB_SRC_DIR}/cmake")
+-add_definitions(-DMESHLAB_SCALAR=double)
+-set(MESHLAB_BUILD_WITH_DOUBLE_SCALAR ON)
++# MeshLab directory
++find_package(meshlab CONFIG)
++if(NOT TARGET meshlab::meshlab-common)
++	set(MESHLAB_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/meshlab/src")
+ 
+-set(EXTERNAL_DIR ${MESHLAB_SRC_DIR}/external)
++	# general meshlab build settings that apply also in pymeshlab:
++	include("${MESHLAB_SRC_DIR}/cmake/meshlab_global_settings.cmake")
+ 
+-if (APPLE AND PYMESHLAB_BUILD_DUMMY_BIN_MAC_DEPLOY)
+-	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/utilities/dummy_bin_mac_deploy)
+-endif()
 +	## Required libraries:
 +	# - OpenGL (ToDo: remove this)
 +	# - Qt5 - OpenGL, Xml
@@ -41,49 +68,14 @@ index 8f9d5d8..b602150 100644
 +	# - OpenMP (not required)
 +	# - Python
  
--find_package(OpenGL REQUIRED)
--find_package(
--	Qt5
--	COMPONENTS OpenGL Xml Network
--	REQUIRED)
+-set(MESHLAB_BUILD_ONLY_LIBRARIES ON)
+-set(MESHLAB_USE_DEFAULT_BUILD_AND_INSTALL_DIRS OFF)
 +	find_package(OpenGL REQUIRED)
 +	find_package(
 +		Qt5
 +		COMPONENTS OpenGL Xml Network
 +		REQUIRED)
  
--message(STATUS "Searching for required components with bundled fallback")
-+	message(STATUS "Searching for required components with bundled fallback")
- 
--find_package(GLEW)
--find_package(Eigen3 QUIET)
--find_package(OpenMP)
-+	find_package(GLEW)
-+	find_package(Eigen3 QUIET)
-+	find_package(OpenMP)
- 
--### Build settings
--set(PYMESHLAB_BUILD_DISTRIB_DIR ${CMAKE_CURRENT_BINARY_DIR}/distrib/pymeshlab)
-+	### Build settings
-+	set(PYMESHLAB_BUILD_DISTRIB_DIR ${CMAKE_CURRENT_BINARY_DIR}/distrib/pymeshlab)
- 
--list(APPEND CMAKE_MODULE_PATH "${MESHLAB_SRC_DIR}/cmake")
--add_definitions(-DMESHLAB_SCALAR=double)
--set(MESHLAB_BUILD_WITH_DOUBLE_SCALAR ON)
-+	list(APPEND CMAKE_MODULE_PATH "${MESHLAB_SRC_DIR}/cmake")
-+	add_definitions(-DMESHLAB_SCALAR=double)
-+	set(MESHLAB_BUILD_WITH_DOUBLE_SCALAR ON)
- 
--set(EXTERNAL_DIR ${MESHLAB_SRC_DIR}/external)
-+	set(EXTERNAL_DIR ${MESHLAB_SRC_DIR}/external)
- 
--if (APPLE AND PYMESHLAB_BUILD_DUMMY_BIN_MAC_DEPLOY)
--	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/utilities/dummy_bin_mac_deploy)
--endif()
--
--set(MESHLAB_BUILD_ONLY_LIBRARIES ON)
--set(MESHLAB_USE_DEFAULT_BUILD_AND_INSTALL_DIRS OFF)
--
 -### Build directories
 -if (NOT PYMESHLAB_BUILD_DUMMY_BIN_MAC_DEPLOY)
 -	set(MESHLAB_BUILD_DISTRIB_DIR ${PYMESHLAB_BUILD_DISTRIB_DIR}/lib)
@@ -91,6 +83,19 @@ index 8f9d5d8..b602150 100644
 -		set(MESHLAB_PLUGIN_OUTPUT_DIR ${MESHLAB_BUILD_DISTRIB_DIR}/plugins)
 -	else()
 -		set(MESHLAB_PLUGIN_OUTPUT_DIR ${PYMESHLAB_BUILD_DISTRIB_DIR}/PlugIns)
++	message(STATUS "Searching for required components with bundled fallback")
++
++	find_package(GLEW)
++	find_package(Eigen3 QUIET)
++	find_package(OpenMP)
++
++	### Build settings
++	list(APPEND CMAKE_MODULE_PATH "${MESHLAB_SRC_DIR}/cmake")
++	add_definitions(-DMESHLAB_SCALAR=double)
++	set(MESHLAB_BUILD_WITH_DOUBLE_SCALAR ON)
++
++	set(EXTERNAL_DIR ${MESHLAB_SRC_DIR}/external)
++
 +	if (APPLE AND PYMESHLAB_BUILD_DUMMY_BIN_MAC_DEPLOY)
 +		add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/utilities/dummy_bin_mac_deploy)
  	endif()
@@ -286,25 +291,21 @@ index 8f9d5d8..b602150 100644
  
  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/pymeshlab)
 diff --git a/src/pymeshlab/CMakeLists.txt b/src/pymeshlab/CMakeLists.txt
-index 20e3511..4d42967 100644
+index 20e3511..b562503 100644
 --- a/src/pymeshlab/CMakeLists.txt
 +++ b/src/pymeshlab/CMakeLists.txt
-@@ -84,9 +84,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+@@ -84,7 +84,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
  include_directories(${MESHLAB_SRC_DIR})
  
  #pybind11
 -add_subdirectory(pybind11)
--if ((NOT PYMESHLAB_BUILD_DEBUG) AND (NOT PYMESHLAB_UPDATE_DOC))
--	pybind11_add_module(${PYMESHLAB_MODULE_NAME} ${HEADERS} ${SOURCES})
-+find_package(pybind11 CONFIG)
++find_package(pybind11 CONFIG)
 +if(NOT TARGET pybind11::module)
 +	add_subdirectory(pybind11)
-+	if ((NOT PYMESHLAB_BUILD_DEBUG) AND (NOT PYMESHLAB_UPDATE_DOC))
-+		pybind11_add_module(${PYMESHLAB_MODULE_NAME} ${HEADERS} ${SOURCES})
-+	endif()
++endif()
+ if ((NOT PYMESHLAB_BUILD_DEBUG) AND (NOT PYMESHLAB_UPDATE_DOC))
+ 	pybind11_add_module(${PYMESHLAB_MODULE_NAME} ${HEADERS} ${SOURCES})
  endif()
- 
- ##### OTHER OPTIONS - debug or doc
 @@ -126,10 +129,17 @@ if (NOT WIN32 AND NOT APPLE)
  endif()
  

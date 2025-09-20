@@ -10,6 +10,11 @@
 
   # propagatedBuildInputs
   meshlab,
+
+  # buildInputs
+  libsForQt5,
+  glew,
+  vcg,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -36,11 +41,29 @@ stdenv.mkDerivation (finalAttrs: {
   propagatedBuildInputs = [
     meshlab
     python3Packages.numpy
+    python3Packages.pythonImportsCheckHook
   ];
+
+  buildInputs = [
+    glew
+    libsForQt5.qtbase
+    vcg
+  ];
+
+  dontWrapQtApps = true;
 
   cmakeFlags = [
     "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}/${python3Packages.python.sitePackages}/pymeshlab"
   ];
+
+  postFixup = ''
+    patchelf \
+      --add-needed ${meshlab}/lib/meshlab/libmeshlab-common.so \
+      $out/${python3Packages.python.sitePackages}/pymeshlab/pmeshlab.*.so
+  '';
+
+
+  pythonImportsCheck = [ "pymeshlab" ];
 
   meta = {
     description = "Open source mesh processing python library";
