@@ -180,29 +180,31 @@ index 9fc92f714..1139d11e7 100644
 2.51.0
 
 
-From 846ebbd3caeb0e5a0958a9dec5a7a929346230ef Mon Sep 17 00:00:00 2001
+From b99fb178c93ddafd5f0da10bf54b9445aa0d284a Mon Sep 17 00:00:00 2001
 From: Guilhem Saurel <guilhem.saurel@laas.fr>
 Date: Fri, 19 Sep 2025 11:26:36 +0200
 Subject: [PATCH 6/6] CMake: install exports
 
 ---
- src/CMakeLists.txt                        | 19 +++++++++++++++++++
- src/Config.cmake.in                       |  8 ++++++++
+ src/CMakeLists.txt                        | 21 +++++++++++++++++++++
+ src/Config.cmake.in                       |  9 +++++++++
  src/common/CMakeLists.txt                 | 18 ++++++++++++++----
  src/meshlabplugins/io_base/CMakeLists.txt |  2 +-
- 4 files changed, 42 insertions(+), 5 deletions(-)
+ 4 files changed, 45 insertions(+), 5 deletions(-)
  create mode 100644 src/Config.cmake.in
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 839a515be..5e4b948e8 100644
+index 839a515be..9f88afa45 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -229,6 +229,25 @@ endforeach()
+@@ -229,6 +229,27 @@ endforeach()
  set(COPIED_FILES)
  
  if (NOT MESHLAB_BUILD_ONLY_LIBRARIES)
++        # headers
++        install(DIRECTORY common DESTINATION include FILES_MATCHING PATTERN "*.h")
 +	# CMake exports
-+	INSTALL(EXPORT meshlabTargets
++	install(EXPORT meshlabTargets
 +		DESTINATION lib/cmake/meshlab
 +		NAMESPACE meshlab::
 +		FILE meshlabTargets.cmake
@@ -225,12 +227,13 @@ index 839a515be..5e4b948e8 100644
  	file(
 diff --git a/src/Config.cmake.in b/src/Config.cmake.in
 new file mode 100644
-index 000000000..a6261e19d
+index 000000000..63ba0ce97
 --- /dev/null
 +++ b/src/Config.cmake.in
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,9 @@
 +@PACKAGE_INIT@
 +
++include(CMakeFindDependencyMacro)
 +find_dependency(GLEW)
 +find_dependency(OpenGL)
 +find_dependency(Qt5 COMPONENTS OpenGL Xml Network)
@@ -238,7 +241,7 @@ index 000000000..a6261e19d
 +
 +include ( "${CMAKE_CURRENT_LIST_DIR}/meshlabTargets.cmake" )
 diff --git a/src/common/CMakeLists.txt b/src/common/CMakeLists.txt
-index 0e640fdd4..c74bd579b 100644
+index 0e640fdd4..182d4645a 100644
 --- a/src/common/CMakeLists.txt
 +++ b/src/common/CMakeLists.txt
 @@ -198,7 +198,8 @@ endif()
@@ -247,7 +250,7 @@ index 0e640fdd4..c74bd579b 100644
  	PUBLIC
 -		${CMAKE_CURRENT_SOURCE_DIR}/..)
 +		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-+		$<INSTALL_INTERFACE:include>)
++                $<INSTALL_INTERFACE:include>)
  
  target_link_libraries(
  	meshlab-common
