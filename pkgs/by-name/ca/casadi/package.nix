@@ -17,7 +17,7 @@
   lib,
   ipopt,
   lapack,
-  llvmPackages,
+  llvmPackages_19,
   mumps,
   ninja,
   osqp,
@@ -35,6 +35,10 @@
   tinyxml-2,
   withUnfree ? false,
 }:
+
+let
+  llvmPackages = llvmPackages_19;
+in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "casadi";
