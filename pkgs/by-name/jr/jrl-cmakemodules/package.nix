@@ -12,8 +12,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "jrl-umi3218";
     repo = "jrl-cmakemodules";
-    rev = "2dd858f5a71d8224f178fb3dc0bcd95256ba10e7";
-    hash = "sha256-Iq9IuhEJBmDd14FhQ3wb94AoJDUjJ1h1D3qCdQYCnUc=";
+    rev = "34ded94";
+    hash = "sha256-Iwe3268qTqVbjo7q9+X0oiXUlMjn5rcBXJNeOwO0O9E=";
   };
 
   nativeBuildInputs = [ cmake ];
