@@ -9,8 +9,6 @@
   lib,
   pinocchio,
   pkg-config,
-  pythonSupport ? false,
-  python3Packages,
   stdenv,
 }:
 
@@ -19,10 +17,12 @@ stdenv.mkDerivation (finalAttrs: {
   version = "3.0.1";
 
   src = fetchFromGitHub {
-    owner = "loco-3d";
+    # owner = "loco-3d";
+    owner = "nim65s";
     repo = "crocoddyl";
-    tag = "v${finalAttrs.version}";
-    hash = "sha256-eUH9fMhuIUp5kuDKNo4B8iJ3JlMIqv7wX6meOpyPTJk=";
+    # tag = "v${finalAttrs.version}";
+    rev = "cmake";
+    hash = "sha256-X+MmVS5kgVSOf6nBW5WeVkIolPhT0bIMQF6Ev0IfJXU=";
   };
 
   outputs = [
@@ -36,31 +36,20 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
     doxygen
     pkg-config
-  ]
-  ++ lib.optionals pythonSupport [
-    python3Packages.python
-    python3Packages.pythonImportsCheckHook
   ];
 
   propagatedBuildInputs = [
     blas
     ipopt
     lapack
-  ]
-  ++ lib.optionals (!pythonSupport) [
     example-robot-data
     pinocchio
-  ]
-  ++ lib.optionals pythonSupport [
-    python3Packages.example-robot-data
-    python3Packages.pinocchio
-    python3Packages.scipy
   ];
 
   cmakeFlags = [
     (lib.cmakeBool "INSTALL_DOCUMENTATION" true)
-    (lib.cmakeBool "BUILD_EXAMPLES" pythonSupport)
-    (lib.cmakeBool "BUILD_PYTHON_INTERFACE" pythonSupport)
+    (lib.cmakeBool "BUILD_EXAMPLES" false)
+    (lib.cmakeBool "BUILD_PYTHON_INTERFACE" false)
   ];
 
   prePatch = ''
@@ -71,8 +60,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   doCheck = true;
-  pythonImportsCheck = [ "crocoddyl" ];
-  checkInputs = lib.optionals pythonSupport [ python3Packages.scipy ];
 
   meta = with lib; {
     description = "Crocoddyl optimal control library";
