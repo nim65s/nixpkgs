@@ -29,6 +29,12 @@ let
       hash = "sha256-nbA+JNogtlktkByUD2Urx3kJpe/8jgIjO59XXOAPpNs=";
     };
 
+    postPatch = ''
+      substituteInPlace CMakeLists.txt --replace-fail \
+        "cmake_minimum_required(VERSION 3.10)" \
+        "cmake_minimum_required(VERSION 3.22)"
+    '';
+
     cmakeFlags = [
       (lib.cmakeBool "BUILD_PY_QCUSTOM_PLOT" (!stdenv.hostPlatform.isDarwin))
       (lib.cmakeBool "BUILD_PY_QGV" (!stdenv.hostPlatform.isDarwin))
