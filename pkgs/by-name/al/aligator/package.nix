@@ -4,8 +4,6 @@
   fontconfig,
   llvmPackages,
   nix-update-script,
-  python3Packages,
-  pythonSupport ? false,
   stdenv,
 
   # nativeBuildInputs
@@ -49,48 +47,32 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
     graphviz
     pkg-config
-  ]
-  ++ lib.optionals pythonSupport [
-    python3Packages.python
-    python3Packages.pythonImportsCheckHook
   ];
+
   buildInputs = [
     fmt
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     llvmPackages.openmp
   ];
+
   propagatedBuildInputs = [
-    suitesparse
-  ]
-  ++ lib.optionals pythonSupport [
-    python3Packages.crocoddyl
-    python3Packages.matplotlib
-    python3Packages.pinocchio
-  ]
-  ++ lib.optionals (!pythonSupport) [
     crocoddyl
     pinocchio
+    suitesparse
   ];
+
   checkInputs = [
     gbenchmark
-  ]
-  ++ lib.optionals pythonSupport [
-    python3Packages.matplotlib
-    python3Packages.pytest
   ];
 
   cmakeFlags = [
-    (lib.cmakeBool "BUILD_PYTHON_INTERFACE" pythonSupport)
+    (lib.cmakeBool "BUILD_PYTHON_INTERFACE" false)
     (lib.cmakeBool "BUILD_WITH_PINOCCHIO_SUPPORT" true)
     (lib.cmakeBool "BUILD_CROCODDYL_COMPAT" true)
     (lib.cmakeBool "BUILD_WITH_OPENMP_SUPPORT" true)
     (lib.cmakeBool "BUILD_WITH_CHOLMOD_SUPPORT" true)
     (lib.cmakeBool "GENERATE_PYTHON_STUBS" false) # this need git at configure time
-  ]
-  ++ lib.optionals (stdenv.hostPlatform.isDarwin && pythonSupport) [
-    # ignore one failing test for now
-    (lib.cmakeFeature "CMAKE_CTEST_ARGUMENTS" "--exclude-regex;'aligator-test-py-rollout|aligator-test-py-frames'")
   ];
 
   # Fontconfig error: Cannot load default config file: No such file: (null)
@@ -105,7 +87,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   doCheck = true;
-  pythonImportsCheck = [ "aligator" ];
 
   passthru.updateScript = nix-update-script { };
 
