@@ -19,14 +19,15 @@
   vcg,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+python3Packages.buildPythonPackage rec {
   pname = "pymeshlab";
   version = "2025.7";
+  pyproject = false;
 
   src = fetchFromGitHub {
     owner = "cnr-isti-vclab";
     repo = "pymeshlab";
-    tag = "v${finalAttrs.version}";
+    tag = "v${version}";
     hash = "sha256-LCR2/AyX9uVX4xhZareUL6YlpUsCFiGDMBB5nFp+H6k=";
   };
 
@@ -100,4 +101,4 @@ stdenv.mkDerivation (finalAttrs: {
     maintainers = with lib.maintainers; [ nim65s ];
     platforms = with lib.platforms; linux ++ darwin;
   };
-})
+}

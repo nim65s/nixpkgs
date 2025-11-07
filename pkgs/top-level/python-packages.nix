@@ -13619,11 +13619,9 @@ self: super: with self; {
 
   pyment = callPackage ../development/python-modules/pyment { };
 
-  pymeshlab = toPythonModule (
-    pkgs.libsForQt5.callPackage ../applications/graphics/pymeshlab {
-      python3Packages = self;
-    }
-  );
+  pymeshlab = pkgs.libsForQt5.callPackage ../applications/graphics/pymeshlab {
+    python3Packages = self;
+  };
 
   pymeta3 = callPackage ../development/python-modules/pymeta3 { };
 
