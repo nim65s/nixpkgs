@@ -5,12 +5,16 @@
   fetchFromGitHub,
   fetchpatch,
 
+  buildPythonPackage,
+  python,
+
   # nativeBuildInputs
   cmake,
-  python3Packages,
+  pybind11,
 
   # propagatedBuildInputs
   meshlab,
+  numpy,
 
   # buildInputs
   libsForQt5,
@@ -19,7 +23,7 @@
   vcg,
 }:
 
-python3Packages.buildPythonPackage rec {
+buildPythonPackage rec {
   pname = "pymeshlab";
   version = "2025.7";
   pyproject = false;
@@ -43,16 +47,12 @@ python3Packages.buildPythonPackage rec {
 
   nativeBuildInputs = [
     cmake
-    python3Packages.pybind11
-  ];
-
-  nativeCheckInputs = [
-    python3Packages.pythonImportsCheckHook
+    pybind11
   ];
 
   propagatedBuildInputs = [
     meshlab
-    python3Packages.numpy
+    numpy
   ];
 
   buildInputs = [
@@ -67,7 +67,7 @@ python3Packages.buildPythonPackage rec {
   dontWrapQtApps = true;
 
   cmakeFlags = [
-    "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}/${python3Packages.python.sitePackages}/pymeshlab"
+    "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}/${python.sitePackages}/pymeshlab"
   ];
 
   # Get io & filter plugins from meshlab, to avoild render, decorate & edit ones
@@ -81,7 +81,7 @@ python3Packages.buildPythonPackage rec {
       pyPlugins = if stdenv.hostPlatform.isDarwin then "PlugIns" else "lib/plugins";
     in
     ''
-      install -D -t $out/${python3Packages.python.sitePackages}/pymeshlab/${pyPlugins} \
+      install -D -t $out/${python.sitePackages}/pymeshlab/${pyPlugins} \
         ${meshlab}/${plugins}/libio_* \
         ${meshlab}/${plugins}/libfilter_*
     '';
@@ -89,7 +89,7 @@ python3Packages.buildPythonPackage rec {
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
     patchelf \
       --add-needed ${meshlab}/lib/meshlab/libmeshlab-common.so \
-      $out/${python3Packages.python.sitePackages}/pymeshlab/pmeshlab.*.so
+      $out/${python.sitePackages}/pymeshlab/pmeshlab.*.so
   '';
 
   pythonImportsCheck = [ "pymeshlab" ];
