@@ -1,0 +1,57 @@
+From 9b50dfba4cc4d79dd8d14698a6744aed6cdf90fd Mon Sep 17 00:00:00 2001
+From: Guilhem Saurel <guilhem.saurel@laas.fr>
+Date: Mon, 22 Dec 2025 19:40:37 +0100
+Subject: [PATCH] CMake: use CMAKE_INSTALL_FULL_INCLUDEDIR
+
+Users may want to provide absolute paths in `CMAKE_INSTALL_INCLUDEDIR`.
+When this is the case, we should not prefix it in any way.
+
+To deal with this use case, use `CMAKE_INSTALL_FULL_*DIR` instead, ref.
+https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html#result-variables
+---
+ install/PackageConfig.cmake.in | 6 +++---
+ install/zenohcxx.pc.in         | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/install/PackageConfig.cmake.in b/install/PackageConfig.cmake.in
+index 3033f726..06309051 100644
+--- a/install/PackageConfig.cmake.in
++++ b/install/PackageConfig.cmake.in
+@@ -25,7 +25,7 @@ endif()
+ 
+ if(NOT TARGET zenohcxx)
+ 	add_library(zenohcxx INTERFACE IMPORTED)
+-	target_include_directories(zenohcxx INTERFACE "${_IMPORT_PREFIX}/@CMAKE_INSTALL_INCLUDEDIR@")
++	target_include_directories(zenohcxx INTERFACE "@CMAKE_INSTALL_FULL_INCLUDEDIR@")
+ endif()
+ 
+ # zenohcxx for zenohpico
+@@ -33,7 +33,7 @@ if(TARGET zenohpico::lib AND NOT TARGET zenohcxx_zenohpico)
+ 	message(STATUS "defined lib target zenohcxx::zenohpico for zenohpico::lib")
+ 	add_library(zenohcxx_zenohpico INTERFACE IMPORTED)
+ 	target_compile_definitions(zenohcxx_zenohpico INTERFACE ZENOHCXX_ZENOHPICO)
+-    target_include_directories(zenohcxx_zenohpico INTERFACE "${_IMPORT_PREFIX}/@CMAKE_INSTALL_INCLUDEDIR@")
++	target_include_directories(zenohcxx_zenohpico INTERFACE "@CMAKE_INSTALL_FULL_INCLUDEDIR@")
+ 	add_dependencies(zenohcxx_zenohpico zenohpico::lib)
+ 	target_link_libraries(zenohcxx_zenohpico INTERFACE zenohpico::lib)
+ 	add_library(zenohcxx::zenohpico ALIAS zenohcxx_zenohpico)
+@@ -44,7 +44,7 @@ if(TARGET zenohc::lib AND NOT TARGET zenohcxx_zenohc)
+ 	message(STATUS "defined lib target zenohcxx::zenohc for zenohc::lib")
+ 	add_library(zenohcxx_zenohc INTERFACE IMPORTED)
+ 	target_compile_definitions(zenohcxx_zenohc INTERFACE ZENOHCXX_ZENOHC)
+-    target_include_directories(zenohcxx_zenohc INTERFACE "${_IMPORT_PREFIX}/@CMAKE_INSTALL_INCLUDEDIR@")
++	target_include_directories(zenohcxx_zenohc INTERFACE "@CMAKE_INSTALL_FULL_INCLUDEDIR@")
+ 	add_dependencies(zenohcxx_zenohc zenohc::lib)
+ 	target_link_libraries(zenohcxx_zenohc INTERFACE zenohc::lib)
+ 	add_library(zenohcxx::zenohc ALIAS zenohcxx_zenohc)
+diff --git a/install/zenohcxx.pc.in b/install/zenohcxx.pc.in
+index 44932995..cd530cd4 100644
+--- a/install/zenohcxx.pc.in
++++ b/install/zenohcxx.pc.in
+@@ -4,4 +4,4 @@ Name: @PROJECT_NAME@
+ Description: @CMAKE_PROJECT_DESCRIPTION@
+ URL: @CMAKE_PROJECT_HOMEPAGE_URL@
+ Version: @PROJECT_VERSION@
+-Cflags: -I${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+\ No newline at end of file
++Cflags: -I@CMAKE_INSTALL_FULL_INCLUDEDIR@

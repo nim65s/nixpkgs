@@ -17,6 +17,11 @@ stdenv.mkDerivation rec {
     hash = "sha256-rznvif87UZbYzZB4yHG4R850qm6Z3beJ1NSG4wrf58M=";
   };
 
+  patches = [
+    # ref. https://github.com/eclipse-zenoh/zenoh-cpp/pull/702
+    ./fix-abs-path.patch
+  ];
+
   cmakeFlags = [
     "-DZENOHCXX_ZENOHC=ON"
     "-DZENOHCXX_ZENOHPICO=OFF"
@@ -29,11 +34,6 @@ stdenv.mkDerivation rec {
   propagatedBuildInputs = [
     zenoh-c
   ];
-
-  postInstall = ''
-    substituteInPlace $out/lib/pkgconfig/zenohcxx.pc \
-      --replace-fail "\''${prefix}/" ""
-  '';
 
   meta = {
     description = "C++ API for zenoh";
