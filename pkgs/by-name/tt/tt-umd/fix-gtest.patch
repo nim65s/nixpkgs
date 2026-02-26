@@ -1,0 +1,47 @@
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 45c5032b..c86d7115 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -7,8 +7,8 @@ target_link_libraries(
+         gtest_main
+         gtest
+         pthread
+-        spdlog::spdlog_header_only
+-        fmt::fmt-header-only
++        spdlog
++        fmt
+         tt-logger::tt-logger
+         $<$<BOOL:${TT_UMD_BUILD_SIMULATION}>:nng>
+ )
+diff --git a/third_party/CMakeLists.txt b/third_party/CMakeLists.txt
+index 6b9f7033..4cbf0fb8 100644
+--- a/third_party/CMakeLists.txt
++++ b/third_party/CMakeLists.txt
+@@ -16,15 +16,18 @@ include(${PROJECT_SOURCE_DIR}/cmake/ttexalens_private.cmake)
+ # google test
+ ####################################################################################################################
+ if(TT_UMD_BUILD_TESTS)
+-    CPMAddPackage(
+-        NAME googletest
+-        GITHUB_REPOSITORY google/googletest
+-        GIT_TAG v1.13.0
+-        VERSION 1.13.0
+-        SYSTEM YES
+-        OPTIONS
+-            "INSTALL_GTEST OFF"
+-    )
++    find_package(GTest GLOBAL)
++    if(NOT GTest_FOUND)
++        CPMAddPackage(
++            NAME googletest
++            GITHUB_REPOSITORY google/googletest
++            GIT_TAG v1.13.0
++            VERSION 1.13.0
++            SYSTEM YES
++            OPTIONS
++                "INSTALL_GTEST OFF"
++        )
++    endif()
+     if(googletest_ADDED)
+         target_compile_options(gtest PRIVATE -Wno-implicit-int-float-conversion)
+     endif()

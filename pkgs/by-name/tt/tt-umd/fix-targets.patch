@@ -1,0 +1,124 @@
+diff --git a/device/CMakeLists.txt b/device/CMakeLists.txt
+index 52cd44e8..9b7296e8 100644
+--- a/device/CMakeLists.txt
++++ b/device/CMakeLists.txt
+@@ -264,8 +264,8 @@ target_link_libraries(
+         umd::Firmware
+         hwloc
+         rt
+-        spdlog::spdlog_header_only
+-        fmt::fmt-header-only
++        spdlog
++        fmt
+         picosha2::picosha2
+         tt-logger::tt-logger
+         yaml-cpp::yaml-cpp
+diff --git a/third_party/CMakeLists.txt b/third_party/CMakeLists.txt
+index 6b9f7033..38e5e476 100644
+--- a/third_party/CMakeLists.txt
++++ b/third_party/CMakeLists.txt
+@@ -33,17 +33,32 @@ endif()
+ ####################################################################################################################
+ # yaml-cpp
+ ####################################################################################################################
+-CPMAddPackage(
+-    NAME yaml-cpp
+-    GITHUB_REPOSITORY jbeder/yaml-cpp
+-    GIT_TAG
+-        2f86d13775d119edbb69af52e5f566fd65c6953b # 0.8.0 + patches
+-    SYSTEM YES
+-    OPTIONS
+-        "YAML_CPP_BUILD_TESTS OFF"
+-        "YAML_CPP_BUILD_TOOLS OFF"
+-        "YAML_BUILD_SHARED_LIBS OFF"
+-)
++
++# CPMAddPackage doesn't support "GLOBAL"
++find_package(yaml-cpp GLOBAL)
++
++if(NOT yaml-cpp_FOUND)
++    CPMAddPackage(
++        NAME yaml-cpp
++        GITHUB_REPOSITORY jbeder/yaml-cpp
++        GIT_TAG
++            2f86d13775d119edbb69af52e5f566fd65c6953b # 0.8.0 + patches
++        SYSTEM YES
++        OPTIONS
++            "YAML_CPP_BUILD_TESTS OFF"
++            "YAML_CPP_BUILD_TOOLS OFF"
++            "YAML_BUILD_SHARED_LIBS OFF"
++    )
++endif()
++
++if(TARGET yaml-cpp::yaml-cpp)
++    # Check if CPM fetched the package from github or locally
++    get_target_property(is_yaml_cpp_imported yaml-cpp::yaml-cpp IMPORTED)
++    if(is_yaml_cpp_imported)
++        # For local fetching set the property to "GLOBAL"
++        set_property(TARGET yaml-cpp::yaml-cpp PROPERTY IMPORTED_GLOBAL TRUE)
++    endif()
++endif()
+ 
+ if(yaml-cpp_ADDED)
+     set_target_properties(
+@@ -145,20 +160,50 @@ CPMAddPackage(
+ ####################################################################################################################
+ # tt-logger
+ ####################################################################################################################
+-CPMAddPackage(NAME tt-logger GITHUB_REPOSITORY tenstorrent/tt-logger VERSION 1.1.8 SYSTEM YES)
++
++# CPMAddPackage doesn't support "GLOBAL"
++find_package(tt-logger GLOBAL)
++
++if(NOT tt-logger_FOUND)
++    CPMAddPackage(NAME tt-logger GITHUB_REPOSITORY tenstorrent/tt-logger VERSION 1.1.8 SYSTEM YES)
++endif()
++
++if(TARGET tt-logger::tt-logger)
++    # Check if CPM fetched the package from github or locally
++    get_target_property(is_tt_logger_imported tt-logger::tt-logger IMPORTED)
++    if(is_tt_logger_imported)
++        # For local fetching set the property to "GLOBAL"
++        set_property(TARGET tt-logger::tt-logger PROPERTY IMPORTED_GLOBAL TRUE)
++    endif()
++endif()
+ 
+ ####################################################################################################################
+ # cxxopts
+ ####################################################################################################################
+-CPMAddPackage(
+-    NAME cxxopts
+-    GITHUB_REPOSITORY jarro2783/cxxopts
+-    GIT_TAG
+-        dbf4c6a66816f6c3872b46cc6af119ad227e04e1 #version 3.2.1 + patches
+-    SYSTEM YES
+-    OPTIONS
+-        "CMAKE_MESSAGE_LOG_LEVEL NOTICE"
+-)
++
++# CPMAddPackage doesn't support "GLOBAL"
++find_package(cxxopts GLOBAL)
++
++if(NOT cxxopts_FOUND)
++    CPMAddPackage(
++        NAME cxxopts
++        GITHUB_REPOSITORY jarro2783/cxxopts
++        GIT_TAG
++            dbf4c6a66816f6c3872b46cc6af119ad227e04e1 #version 3.2.1 + patches
++        SYSTEM YES
++        OPTIONS
++            "CMAKE_MESSAGE_LOG_LEVEL NOTICE"
++    )
++endif()
++
++if(TARGET cxxopts::cxxopts)
++    # Check if CPM fetched the package from github or locally
++    get_target_property(is_cxxopts_imported cxxopts::cxxopts IMPORTED)
++    if(is_cxxopts_imported)
++        # For local fetching set the property to "GLOBAL"
++        set_property(TARGET cxxopts::cxxopts PROPERTY IMPORTED_GLOBAL TRUE)
++    endif()
++endif()
+ 
+ ####################################################################################################################
+ # nanobind
