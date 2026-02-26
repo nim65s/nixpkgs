@@ -27,7 +27,7 @@
 buildPythonPackage (finalAttrs: {
   pname = "nanobind";
   version = "2.12.0";
-  pyproject = true;
+  pyproject = false;
 
   src = fetchFromGitHub {
     owner = "wjakob";
