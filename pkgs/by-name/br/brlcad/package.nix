@@ -24,6 +24,7 @@
   libpng,
   lmdb,
   netpbm,
+  nlohmann_json,
   opencv,
   openmesh,
   pugixml,
@@ -142,6 +143,7 @@ stdenv.mkDerivation (finalAttrs: {
     libpng
     lmdb
     netpbm
+    nlohmann_json
     opencv
     openmesh
     pugixml
