@@ -117,6 +117,16 @@ stdenv.mkDerivation (finalAttrs: {
       build/bext/itk/addfiles/FindTCL.cmake \
       build/bext/tktable/tktable/CMake/FindTCL.cmake \
       build/bext/tkhtml/tkhtml/CMake/FindTCL.cmake
+
+    # fix link to tinygltf
+    substituteInPlace src/libged/bot/CMakeLists.txt \
+      --replace-fail \
+        "find_package_eigen(REQUIRED)" \
+        "find_package_eigen(REQUIRED)
+        find_package(TinyGLTF REQUIRED CONFIG)" \
+      --replace-fail \
+        "set(BOT_LIBS libged libbg libbu" \
+        "set(BOT_LIBS libged libbg libbu tinygltf::tinygltf"
   '';
 
   nativeBuildInputs = [
