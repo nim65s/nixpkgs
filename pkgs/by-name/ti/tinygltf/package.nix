@@ -7,10 +7,6 @@
 
   # nativeBuildInputs
   cmake,
-
-  # propagatedBuildInputs
-  nlohmann_json,
-  stb,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -28,13 +24,10 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
   ];
 
-  propagatedBuildInputs = [
-    nlohmann_json
-    stb
-  ];
-
   cmakeFlags = [
-    (lib.cmakeBool "TINYGLTF_INSTALL_VENDOR" false)
+    # unvendoring will break downstream applications
+    # unless at least patch the CMake modules
+    (lib.cmakeBool "TINYGLTF_INSTALL_VENDOR" true)
   ];
 
   passthru.updateScript = nix-update-script { };
