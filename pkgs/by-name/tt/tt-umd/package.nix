@@ -92,6 +92,9 @@ stdenv.mkDerivation (finalAttrs: {
     ))
     (lib.cmakeBool "TT_UMD_BUILD_TESTS" finalAttrs.doCheck)
     (lib.cmakeBool "TT_UMD_BUILD_STATIC" stdenv.hostPlatform.isStatic)
+
+    # Cmake cannot find nanobind-config.cmake by itself for now because of scikit-build
+    (lib.cmakeFeature "nanobind_DIR" "${python3.pkgs.nanobind}/${python3.sitePackages}/nanobind/cmake")
   ];
 
   nativeCheckInputs = [
