@@ -15,7 +15,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "eclipse-zenoh";
     repo = "zenoh-c";
-    tag = version;
+    tag = finalAttrs.version;
     hash = "sha256-p16dbXgPcRcvu+N7OLSVWqFI8JfCWvzLA1iovWqEVSE=";
   };
 
