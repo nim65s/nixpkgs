@@ -5,6 +5,7 @@
   cargo,
   rustPlatform,
   rustc,
+  callPackage,
 }:
 
 buildPythonPackage rec {
@@ -39,6 +40,10 @@ buildPythonPackage rec {
   pythonImportsCheck = [
     "zenoh"
   ];
+
+  passthru.tests = {
+    zenoh-test = callPackage ./test.nix { };
+  };
 
   meta = {
     description = "Python API for zenoh";
