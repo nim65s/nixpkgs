@@ -82,7 +82,6 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeBool "TT_UMD_BUILD_TESTS" finalAttrs.finalPackage.doCheck)
     (lib.cmakeBool "TT_UMD_BUILD_STATIC" stdenv.hostPlatform.isStatic)
     (lib.cmakeBool "TT_UMD_BUILD_PYTHON" true)
-    (lib.cmakeFeature "nanobind_DIR" "${python3.pkgs.nanobind}/${python3.sitePackages}/nanobind/cmake")
   ];
 
   postInstall = ''
