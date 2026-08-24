@@ -75,10 +75,6 @@ buildPythonPackage (finalAttrs: {
     nanobind
   ];
 
-  cmakeFlags = [
-    (lib.cmakeFeature "nanobind_DIR" "${nanobind}/${python.sitePackages}/nanobind/cmake")
-  ];
-
   build-system = [
     nanobind
     scikit-build-core
