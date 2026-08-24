@@ -22,10 +22,6 @@ buildPythonPackage {
 
   dontUseCmakeConfigure = true;
 
-  env = {
-    nanobind_DIR = "${nanobind}/${python.sitePackages}/nanobind/cmake";
-  };
-
   cmakeFlags = [
     (lib.cmakeBool "ZXING_USE_BUNDLED_ZINT" false)
   ];
