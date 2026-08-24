@@ -23,6 +23,7 @@ let
     ;
   inherit (python3Packages)
     build
+    nanobind
     pybind11
     python
     setuptools
@@ -50,6 +51,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     build
     cmake
+    nanobind
     ninja
     pybind11
     python
@@ -77,8 +79,6 @@ stdenv.mkDerivation (finalAttrs: {
     ONNX_ML = "1";
     ONNX_NAMESPACE = "onnx";
     ONNX_USE_PROTOBUF_SHARED_LIBS = "1";
-
-    nanobind_DIR = "${python3Packages.nanobind}/${python.sitePackages}/nanobind/cmake";
   };
 
   cmakeFlags = mapAttrsToList cmakeFeature finalAttrs.env;
