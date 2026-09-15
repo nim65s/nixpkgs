@@ -14,9 +14,8 @@
   tensorboard,
   tensordict,
   torch,
-  torchvision,
 
-  # optional-dependencies
+  # optional-dependencies
   wandb,
 
   # tests
@@ -25,7 +24,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "rsl-rl-lib";
-  version = "5.4.2";
+  version = "5.5.1";
   pyproject = true;
   __structuredAttrs = true;
 
@@ -33,7 +32,7 @@ buildPythonPackage (finalAttrs: {
     owner = "leggedrobotics";
     repo = "rsl_rl";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-m9M9yWCKs5vLHb7k5A7AFfHko980HDeF3qr1x7s1KGE=";
+    hash = "sha256-JfWw1JQmJ4ioW9APBtquVh3rKaEiusx8TQQn+l7sa3s=";
   };
 
   build-system = [
@@ -48,7 +47,6 @@ buildPythonPackage (finalAttrs: {
     tensorboard
     tensordict
     torch
-    torchvision
   ];
 
   optional-dependencies = {
