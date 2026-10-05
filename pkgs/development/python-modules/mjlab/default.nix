@@ -30,20 +30,21 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "mjlab";
-  version = "1.6.0";
+  version = "1.6.0-unstable-2026-10-04";
   pyproject = true;
   __structuredAttrs = true;
 
   src = fetchFromGitHub {
     owner = "mujocolab";
     repo = "mjlab";
-    tag = "v${finalAttrs.version}";
-    hash = "sha256-nB+FopWsK7Q7g6Ygv0prInvrLfVHx1qK+FLFZQyo/HE=";
+    rev = "4f7329183f097baa93af6e21e7e9241fc45bf978";
+    hash = "sha256-AZzvlyLkmnnsBbxyA5hdmOLlBt6nBoyhJJzN+ygWb/A=";
   };
 
   postPatch = ''
     substituteInPlace pyproject.toml \
-      --replace-fail '"uv_build>=' '"uv_build"] #'
+      --replace-fail '"uv_build>=' '"uv_build"] #' \
+      --replace-fail '"torch>=2.14.0",' '"torch>=2.13.0",'
   '';
 
   build-system = [
