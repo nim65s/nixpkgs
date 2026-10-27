@@ -26,7 +26,8 @@ stdenv.mkDerivation (finalAttrs: {
   # 3.8 is too old for opensim 4.6:
   # https://github.com/opensim-org/opensim-core/issues/4369
   # and opensim versions before that are not compatible with C++20
-  version = "3.8-unstable-2026-10-26";
+  # so take commit from https://github.com/opensim-org/opensim-core/blob/4.6/dependencies/CMakeLists.txt#L188
+  version = "3.8-unstable-2026-06-01";
   __structuredAttrs = true;
   strictDeps = true;
 
@@ -34,8 +35,8 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "simbody";
     repo = "simbody";
     # tag = "Simbody-${finalAttrs.version}";
-    rev = "47082210cba91565d3df5321a84190f8f5127905";
-    hash = "sha256-Ki4JzjmdkwQPCRz8Z1ADAGAqlppR63zoq+609rQgm+Y=";
+    rev = "80a3f10a6daa26c8aaf18f2c672cf385b227e62c";
+    hash = "sha256-3sKl2kXxNIQZ1UlJSVFy/QjR8+D5rf+E2pHMCn/O9pw=";
   };
 
   postPatch = ''
@@ -71,6 +72,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   disabledTests = [
+    # https://github.com/simbody/simbody/issues/756
+    "TestCustomConstraints"
     # https://github.com/simbody/simbody/issues/877
     "TestCableSpan"
   ];

@@ -1,9 +1,18 @@
 {
+  breakpointHook,
+  vim,
   lib,
   stdenv,
   fetchFromGitHub,
 
+  buildNpmPackage,
+
+  ant,
   cmake,
+  jdk,
+  netbeans,
+  nodejs,
+  xmlstarlet,
 
   blas,
   lapack,
@@ -24,11 +33,43 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "opensim-org";
     repo = "opensim-gui";
     tag = finalAttrs.version;
-    hash = "sha256-d/Y93jCvMJvLn+Z1VFsmpW4McNcvQJY2rRAB3JEkAks=";
+    hash = "sha256-1d74mNpzektx4j35Te1XvEnhjO6KD/Z7vvmx2jND+pk=";
+    fetchSubmodules = true; # nor opensim-models, opensim-visualizer & opensim-viewer
   };
 
+  npmRoot = "Gui/opensim/opensim-viewer";
+  postPatch =
+    let
+      opensim-viewer = buildNpmPackage {
+        pname = "opensim-viewer";
+        inherit (finalAttrs) version src;
+        sourceRoot = "${finalAttrs.src.name}/${finalAttrs.npmRoot}";
+        npmDepsHash = "sha256-AZilhv4Ij20D64oo4AwE0do1OhIJZRG8zLOA1idKdWE=";
+        installPhase = ''
+          runHook preInstall
+          cp -r build $out
+          runHook postInstall
+        '';
+      };
+    in
+    ''
+      substituteInPlace Gui/opensim/build.xml --replace-fail \
+        "npm.cmd" \
+        "${lib.getExe' nodejs "npm"}"
+
+      mkdir -p ${finalAttrs.npmRoot}/build
+      cp -r ${opensim-viewer}/* ${finalAttrs.npmRoot}/build/
+    '';
+
   nativeBuildInputs = [
+    breakpointHook
+    vim
+    ant
     cmake
+    netbeans
+    nodejs
+    jdk
+    xmlstarlet
   ];
 
   buildInputs = [
@@ -37,6 +78,15 @@ stdenv.mkDerivation (finalAttrs: {
     opensim-core
     simbody
     spdlog
+  ];
+
+  cmakeFlags = [
+    (lib.cmakeFeature "ANT_ARGS" (
+      lib.concatStringsSep ";" [
+        "-Dnbplatform.default.netbeans.dest.dir=${netbeans}/netbeans"
+        "-Dnbplatform.default.harness.dir=${netbeans}/netbeans/harness"
+      ]
+    ))
   ];
 
   passthru.updateScript = nix-update-script { };

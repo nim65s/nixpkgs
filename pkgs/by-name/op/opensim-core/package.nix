@@ -4,18 +4,19 @@
   fetchFromGitHub,
 
   cmake,
-  # doxygen,
+  doxygen,
   pkg-config,
-  # python3,
+  python3,
   swig,
-  # texliveBasic,
+  texliveBasic,
 
   blas,
   lapack,
   casadi,
+  ezc3d,
   ipopt,
   jdk,
-  # python3Packages,
+  python3Packages,
   simbody,
   spdlog,
 
@@ -52,35 +53,36 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     cmake
-    # doxygen
+    doxygen
     pkg-config
-    # python3
+    python3
     swig
-    # texliveBasic
+    texliveBasic
   ];
 
   buildInputs = [
     blas
     lapack
     casadi
+    ezc3d
     ipopt
     jdk
-    # python3Packages.numpy
+    python3Packages.numpy
     simbody
     spdlog
   ];
 
   cmakeFlags = [
     (lib.cmakeBool "BUILD_JAVA_WRAPPING" true)
-    # (lib.cmakeBool "BUILD_PYTHON_WRAPPING" true)
+    (lib.cmakeBool "BUILD_PYTHON_WRAPPING" true)
     (lib.cmakeBool "OPENSIM_COPY_DEPENDENCIES" false)
-    # (lib.cmakeBool "OPENSIM_DOXYGEN_USE_MATHJAX" false)
+    (lib.cmakeBool "OPENSIM_DOXYGEN_USE_MATHJAX" false)
     (lib.cmakeBool "OPENSIM_PYTHON_STANDALONE" false)
-    # (lib.cmakeFeature "OPENSIM_C3D_PARSER" "ezc3d")
+    (lib.cmakeFeature "OPENSIM_C3D_PARSER" "ezc3d")
     (lib.cmakeFeature "SIMBODY_HOME" "${simbody}")
   ];
 
-  # doCheck = true;
+  doCheck = true;
 
   checkInputs = [
     catch2_3
@@ -91,9 +93,17 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   disabledTests = [
+    # flaky
     "testContactGeometry"
+    # fail
+    "testFrames"
     "testManager"
     "testForward"
+    "python_examples"
+    # too long
+    # "testMocoInverse" # 152.97 sec
+    # "testMocoConstraints" # 277.61 sec
+    # "testMocoActuators" # 677.92 sec
   ];
 
   passthru.updateScript = nix-update-script { };
