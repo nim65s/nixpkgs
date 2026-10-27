@@ -2,6 +2,8 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  breakpointHook,
+  vim,
 
   cmake,
   doxygen,
@@ -21,15 +23,19 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "simbody";
-  version = "3.8";
+  # 3.8 is too old for opensim 4.6:
+  # https://github.com/opensim-org/opensim-core/issues/4369
+  # and opensim versions before that are not compatible with C++20
+  version = "3.8-unstable-2026-10-26";
   __structuredAttrs = true;
   strictDeps = true;
 
   src = fetchFromGitHub {
     owner = "simbody";
     repo = "simbody";
-    tag = "Simbody-${finalAttrs.version}";
-    hash = "sha256-SS4Rhe7G2Fc0Gj/9jeyU9gVTTjtRfFT9nhnBDDF4NjM=";
+    # tag = "Simbody-${finalAttrs.version}";
+    rev = "47082210cba91565d3df5321a84190f8f5127905";
+    hash = "sha256-Ki4JzjmdkwQPCRz8Z1ADAGAqlppR63zoq+609rQgm+Y=";
   };
 
   postPatch = ''
@@ -37,6 +43,8 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   nativeBuildInputs = [
+    breakpointHook
+    vim
     cmake
     doxygen
   ];
@@ -63,8 +71,8 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   disabledTests = [
-    # ref https://github.com/simbody/simbody/issues/756
-    "TestCustomConstraints"
+    # https://github.com/simbody/simbody/issues/877
+    "TestCableSpan"
   ];
 
   passthru.updateScript = nix-update-script { };

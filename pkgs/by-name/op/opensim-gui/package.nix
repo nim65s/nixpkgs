@@ -2,7 +2,15 @@
   lib,
   stdenv,
   fetchFromGitHub,
+
   cmake,
+
+  blas,
+  lapack,
+  opensim-core,
+  simbody,
+  spdlog,
+
   nix-update-script,
 }:
 
@@ -23,6 +31,14 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
   ];
 
+  buildInputs = [
+    blas
+    lapack
+    opensim-core
+    simbody
+    spdlog
+  ];
+
   passthru.updateScript = nix-update-script { };
 
   meta = {
@@ -32,6 +48,6 @@ stdenv.mkDerivation (finalAttrs: {
     license = lib.licenses.asl20;
     maintainers = with lib.maintainers; [ nim65s ];
     mainProgram = "opensim-gui";
-    platforms = lib.platforms.all;
+    platforms = lib.platforms.unix ++ lib.platforms.windows;
   };
 })
