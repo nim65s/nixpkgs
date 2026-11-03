@@ -20,13 +20,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "toppra";
-  version = "0.6.9";
+  version = "0.6.10";
 
   src = fetchFromGitHub {
     owner = "hungpham2511";
     repo = "toppra";
     tag = finalAttrs.version;
-    hash = "sha256-MD3m8vLLW3AUXXp5z5i8svEkvXMtDZH5kRDHhgHd4po=";
+    hash = "sha256-ar/0rD7Mco7Hh5RqHQqq6TuPQJdwr1EBmsZx4euAo+Q=";
   };
 
   sourceRoot = "source/cpp";
