@@ -67,6 +67,11 @@ stdenv.mkDerivation (finalAttrs: {
     python3Packages.pybind11
   ];
 
+  preBuild = ''
+    make -j || true
+    make VERBOSE=1 -j 1
+  '';
+
   propagatedBuildInputs = [
     assimp
     blas
