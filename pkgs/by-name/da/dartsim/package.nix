@@ -68,7 +68,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   preBuild = ''
-    make -j 4 || true
+    make -j 2 || true
     make VERBOSE=1 -j 1
   '';
 
