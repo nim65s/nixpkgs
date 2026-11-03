@@ -1,0 +1,11 @@
+name: "debug"
+on:
+  push:
+      - imgui-dartsim-debug
+jobs:
+  nix:
+    runs-on: "macos-latest"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: nixbuild/nix-quick-install-action@v35
+      - run: nix build -L .#simbody
