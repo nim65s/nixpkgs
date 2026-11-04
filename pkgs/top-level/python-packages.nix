@@ -22534,6 +22534,8 @@ self: super: with self; {
 
   visitor = callPackage ../development/python-modules/visitor { };
 
+  visp = toPythonModule (pkgs.visp.override { python3 = python; });
+
   vispy = callPackage ../development/python-modules/vispy { };
 
   viv-utils = callPackage ../development/python-modules/viv-utils { };

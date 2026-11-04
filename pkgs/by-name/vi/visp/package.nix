@@ -4,7 +4,6 @@
   doxygen,
   eigen,
   fetchFromGitHub,
-  fetchpatch,
   lapack,
   lib,
   libdc1394,
@@ -15,12 +14,14 @@
   librealsense,
   libxml2,
   libx11,
+  llvmPackages,
   nlohmann_json,
   #ogre,
   openblas,
   opencv,
+  perl,
   pkg-config,
-  python3Packages,
+  python3,
   stdenv,
   texliveSmall,
   libv4l,
@@ -29,44 +30,45 @@
   zlib,
 }:
 
+let
+  # only required for building bindings, stubs & docs
+  python = python3.withPackages (
+    p: with p; [
+      cxxheaderparser
+      doxmlparser
+      lxml
+      mypy
+      numpy
+      pcpp
+      pip
+      pybind11
+      setuptools
+      sphinx
+      sphinx-design
+      sphinxcontrib-jsmath
+      tqdm
+      wheel
+    ]
+  );
+in
+
 stdenv.mkDerivation (finalAttrs: {
   pname = "visp";
-  version = "3.6.0";
+  version = "3.7.0";
 
   src = fetchFromGitHub {
     owner = "lagadic";
     repo = "visp";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-m5Tmr+cZab7eSjmbXb8HpJpFHb0UYFTyimY+CkfBIAo=";
+    hash = "sha256-sC7HB/eOiXURPTxRTbUHV6Ws7o9dcUwEG3Y0GezN7kw=";
   };
-
-  patches = [
-    # fix for absolute install paths
-    # this was merged upstream, and can be removed on next release
-    (fetchpatch {
-      url = "https://github.com/lagadic/visp/pull/1416/commits/fdda5620389badee998fe1926ddd3b46f7a6bcd8.patch";
-      hash = "sha256-W3vvBdQdp59WAMjuucNoWI0eCyPHjWerl7VCNcPVvzI=";
-    })
-
-    # fix for opencv new Universal Intrinsic API
-    # this was merged upstream, and can be removed on next release
-    (fetchpatch {
-      url = "https://github.com/lagadic/visp/pull/1310/commits/9ed0300507e13dddd83fd62a799f5039025ea44e.patch";
-      hash = "sha256-xrJ7B/8mEfi9dM/ToMr6vCAwX/FMw+GA/W0zFYgT32s=";
-    })
-
-    # fix error: unsupported option '-mfpu=' on darwin
-    # this was merged upstream, and can be removed on next release
-    (fetchpatch {
-      url = "https://github.com/lagadic/visp/commit/8c1461661f99a5db31c89ede9946d2b0244f8123.patch";
-      hash = "sha256-MER5KDrFxKs+Y5G9UcEIAh95Zilmv1Vp4xq+isRMM/U=";
-    })
-  ];
 
   nativeBuildInputs = [
     cmake
     doxygen
+    perl
     pkg-config
+    python
     texliveSmall
   ];
 
@@ -85,7 +87,6 @@ stdenv.mkDerivation (finalAttrs: {
     #ogre
     openblas
     opencv
-    python3Packages.numpy
     libpthread-stubs
     zbar
     zlib
@@ -93,9 +94,43 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     coin3d
     libv4l
+  ]
+  ++ lib.optionals stdenv.cc.isClang [
+    llvmPackages.openmp
   ];
 
+  env = {
+    # cmake use multiple pip install and custom setup.py
+    # to build bindings, stubs, and docs
+    PIP_PREFIX = placeholder "out";
+    PIP_NO_BUILD_ISOLATION = "0"; # https://github.com/pypa/pip/issues/5735
+    PIP_NO_DEPS = "1";
+    PIP_BREAK_SYSTEM_PACKAGES = "1"; # we want to write in $out, which is /nix/store
+    # and need to run things from there
+    PYTHONPATH = "${placeholder "out"}/${python.sitePackages}";
+  };
+
+  cmakeFlags = [
+    (lib.cmakeBool "ALLOW_SYSTEM_PYTHON" true)
+  ];
+
+  postInstall = ''
+    # bindings are not in ALL
+    make visp_python_bindings
+
+    # and contain forbidden references to /build/
+    _visp=$out/${python.sitePackages}/visp/_visp.*
+    _rpath=$(patchelf --print-rpath $_visp | tr ':' '\n' | sed '/^\/build/d' | tr '\n' ':')
+    patchelf --set-rpath $_rpath $_visp
+  '';
+
   doCheck = true;
+
+  nativeCheckInputs = [
+    python3.pkgs.pythonImportsCheckHook
+  ];
+
+  pythonImportsCheck = [ "visp" ];
 
   meta = {
     description = "Open Source Visual Servoing Platform";
