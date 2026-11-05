@@ -10,6 +10,7 @@
   eigenpy,
   pylatexenc,
   numpy,
+  suitesparse,
 
   buildStandalone ? true,
 }:
@@ -34,6 +35,12 @@ toPythonModule (
     ]
     ++ super.propagatedBuildInputs
     ++ lib.optional buildStandalone coal;
+
+    buildInputs =
+      super.buildInputs
+      ++ lib.optional eigenpy.withCholmod [
+        suitesparse
+      ];
 
     nativeCheckInputs = [
       pythonImportsCheckHook

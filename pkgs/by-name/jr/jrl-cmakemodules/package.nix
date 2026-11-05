@@ -53,6 +53,10 @@ stdenv.mkDerivation (finalAttrs: {
   cmakeFlags = [
     (lib.cmakeBool "JRL_CMAKEMODULES_GENERATE_API_DOC" true)
     (lib.cmakeBool "JRL_CMAKEMODULES_BUILD_TESTS" finalAttrs.finalPackage.doCheck)
+    (lib.cmakeBool "JRL_CMAKEMODULES_ENABLE_TEST_CPPAD" true)
+    (lib.cmakeBool "JRL_CMAKEMODULES_ENABLE_TEST_CPPADCG" false) # wait for #390728
+    (lib.cmakeBool "JRL_CMAKEMODULES_ENABLE_TEST_GMP" true)
+    (lib.cmakeBool "JRL_CMAKEMODULES_ENABLE_TEST_MPFR" true)
   ];
 
   doCheck = true;
@@ -93,10 +97,8 @@ stdenv.mkDerivation (finalAttrs: {
       (lib.cmakeFeature "DOXYGEN_HTML_FORMULA_FORMAT" "svg")
       (lib.cmakeFeature "DOXYGEN_HTML_OUTPUT" "doxygen-html")
       (lib.cmakeBool "DOXYGEN_USE_MATHJAX" false)
-      (lib.cmakeBool "JRL_CMAKEMODULES_ENABLE_TEST_CPPAD" true)
-      (lib.cmakeBool "JRL_CMAKEMODULES_ENABLE_TEST_CPPADCG" false) # wait for #390728
-      (lib.cmakeBool "JRL_CMAKEMODULES_ENABLE_TEST_GMP" true)
-      (lib.cmakeBool "JRL_CMAKEMODULES_ENABLE_TEST_MPFR" true)
+      (lib.cmakeBool "BUILD_DOCUMENTATION" true)
+      (lib.cmakeBool "INSTALL_DOCUMENTATION" true)
     ];
   };
 

@@ -20,6 +20,13 @@ toPythonModule (
   aligator.overrideAttrs (super: {
     pname = "py-${super.pname}";
 
+    postPatch = ''
+      substituteInPlace CMakeLists.txt --replace-fail \
+        "set(PYTHON_COMPONENTS Interpreter Development NumPy)" \
+        "set(PYTHON_COMPONENTS Interpreter Development.Module NumPy)
+        FINDPYTHON(REQUIRED)"
+    '';
+
     cmakeFlags = super.cmakeFlags ++ [
       (lib.cmakeBool "BUILD_PYTHON_INTERFACE" true)
       (lib.cmakeBool "BUILD_STANDALONE_PYTHON_INTERFACE" buildStandalone)
